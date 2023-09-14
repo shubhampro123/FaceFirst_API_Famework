@@ -4,7 +4,7 @@
 
 Project Name: FaceFirst Automation
 Technology Stack: Python (3.11v), Selenium,PyCharm
-Framework Type: Hybrid-framwork
+Framework Type: Hybrid-framwork 
 
 
 #********************
