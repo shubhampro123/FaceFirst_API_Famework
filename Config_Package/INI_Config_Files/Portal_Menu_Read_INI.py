@@ -34,6 +34,7 @@ class Read_Portal_Menu_Components:
     def get_loginButton(self):
         try:
             login_btn = self.config.get('LOCATORS', 'portal_login_page_loginBtn_by_xpath')
+            # Base_Class.logger.info("URL read successfully : ", url)
             return login_btn
         except Exception as ex:
             print(ex)

@@ -152,14 +152,19 @@ IMP Note* => Login Username and password :
 	B) P1 test cases: 131
 	C) P2 test cases: 0
 
-**************************************
+**************************************	
 
-9) Audit Log Report module:
-	A) Test cases count:147
-	B) P1 test cases: 10
-	C) P2 test cases: 0
+10) Users module prerequisites :
+	1) Change the region data from the users module ini file before running the script --> (region_data_input = <region data>).
+	2) Test data is passed from the ini file >
+	> Test_Data > Data_From_INI > Users.ini
 
-**************************************
+    Users module:
+        A) Test cases count : 140
+	B) P1 test cases : 95
+	C) P2 test cases : 45
+
+**************************************	
 
 
 
