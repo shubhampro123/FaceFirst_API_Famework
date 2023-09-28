@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>report_26_09_23.html</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) { // eslint-disable-line no-redeclare
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function findAll(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sortColumn(elem) {
+    toggleSortStates(elem);
+    const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    let key;
+    if (elem.classList.contains('result')) {
+        key = keyResult;
+    } else if (elem.classList.contains('links')) {
+        key = keyLink;
+    } else {
+        key = keyAlpha;
+    }
+    sortTable(elem, key(colIndex));
+}
+
+function showAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(showExtras);
+}
+
+function hideAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(hideExtras);
+}
+
+function showExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.remove('collapsed');
+    expandcollapse.classList.remove('expander');
+    expandcollapse.classList.add('collapser');
+}
+
+function hideExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.add('collapsed');
+    expandcollapse.classList.remove('collapser');
+    expandcollapse.classList.add('expander');
+}
+
+function showFilters() {
+    let visibleString = getQueryParameter('visible') || 'all';
+    visibleString = visibleString.toLowerCase();
+    const checkedItems = visibleString.split(',');
+
+    const filterItems = document.getElementsByClassName('filter');
+    for (let i = 0; i < filterItems.length; i++) {
+        filterItems[i].hidden = false;
+
+        if (visibleString != 'all') {
+            filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
+            filterTable(filterItems[i]);
+        }
+    }
+}
+
+function addCollapse() {
+    // Add links for show/hide all
+    const resulttable = find('table#results-table');
+    const showhideall = document.createElement('p');
+    showhideall.innerHTML = '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+                            '<a href="javascript:hideAllExtras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    findAll('.col-result').forEach(function(elem) {
+        const collapsed = getQueryParameter('collapsed') || 'Passed';
+        const extras = elem.parentNode.nextElementSibling;
+        const expandcollapse = document.createElement('span');
+        if (extras.classList.contains('collapsed')) {
+            expandcollapse.classList.add('expander');
+        } else if (collapsed.includes(elem.innerHTML)) {
+            extras.classList.add('collapsed');
+            expandcollapse.classList.add('expander');
+        } else {
+            expandcollapse.classList.add('collapser');
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener('click', function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains('collapsed')) {
+                showExtras(event.currentTarget);
+            } else {
+                hideExtras(event.currentTarget);
+            }
+        });
+    });
+}
+
+function getQueryParameter(name) {
+    const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function init () { // eslint-disable-line no-unused-vars
+    resetSortHeaders();
+
+    addCollapse();
+
+    showFilters();
+
+    sortColumn(find('.initial-sort'));
+
+    findAll('.sortable').forEach(function(elem) {
+        elem.addEventListener('click',
+            function() {
+                sortColumn(elem);
+            }, false);
+    });
+}
+
+function sortTable(clicked, keyFunc) {
+    const rows = findAll('.results-table-row');
+    const reversed = !clicked.classList.contains('asc');
+    const sortedRows = sort(rows, keyFunc, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    const thead = document.getElementById('results-table-head');
+    document.getElementById('results-table').remove();
+    const parent = document.createElement('table');
+    parent.id = 'results-table';
+    parent.appendChild(thead);
+    sortedRows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName('BODY')[0].appendChild(parent);
+}
+
+function sort(items, keyFunc, reversed) {
+    const sortArray = items.map(function(item, i) {
+        return [keyFunc(item), i];
+    });
+
+    sortArray.sort(function(a, b) {
+        const keyA = a[0];
+        const keyB = b[0];
+
+        if (keyA == keyB) return 0;
+
+        if (reversed) {
+            return keyA < keyB ? 1 : -1;
+        } else {
+            return keyA > keyB ? 1 : -1;
+        }
+    });
+
+    return sortArray.map(function(item) {
+        const index = item[1];
+        return items[index];
+    });
+}
+
+function keyAlpha(colIndex) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[colIndex].firstChild.data.toLowerCase();
+    };
+}
+
+function keyLink(colIndex) {
+    return function(elem) {
+        const dataCell = elem.childNodes[1].childNodes[colIndex].firstChild;
+        return dataCell == null ? '' : dataCell.innerText.toLowerCase();
+    };
+}
+
+function keyResult(colIndex) {
+    return function(elem) {
+        const strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+            'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[colIndex].firstChild.data);
+    };
+}
+
+function resetSortHeaders() {
+    findAll('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    findAll('.sortable').forEach(function(elem) {
+        const icon = document.createElement('div');
+        icon.className = 'sort-icon';
+        icon.textContent = 'vvv';
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove('desc', 'active');
+        elem.classList.add('asc', 'inactive');
+    });
+}
+
+function toggleSortStates(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        resetSortHeaders();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function isAllRowsHidden(value) {
+    return value.hidden == false;
+}
+
+function filterTable(elem) { // eslint-disable-line no-unused-vars
+    const outcomeAtt = 'data-test-result';
+    const outcome = elem.getAttribute(outcomeAtt);
+    const classOutcome = outcome + ' results-table-row';
+    const outcomeRows = document.getElementsByClassName(classOutcome);
+
+    for(let i = 0; i < outcomeRows.length; i++){
+        outcomeRows[i].hidden = !elem.checked;
+    }
+
+    const rows = findAll('.results-table-row').filter(isAllRowsHidden);
+    const allRowsHidden = rows.length == 0 ? true : false;
+    const notFoundMessage = document.getElementById('not-found-message');
+    notFoundMessage.hidden = !allRowsHidden;
+}
+</script>
+    <h1>report_26_09_23.html</h1>
+    <p>Report generated on 26-Sep-2023 at 18:45:25 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>JAVA_HOME</td>
+        <td>C:\Program Files\Java\jdk-17</td></tr>
+      <tr>
+        <td>Packages</td>
+        <td>{"pluggy": "1.0.0", "pytest": "7.2.1"}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.19045-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{"allure-pytest": "2.12.0", "html": "3.2.0", "metadata": "2.0.4"}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.11.4</td></tr></table>
+    <h2>Summary</h2>
+    <p>10 tests ran in 92.97 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">10 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable" col="duration">Duration</th>
+          <th class="sortable links" col="links">Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_01</td>
+          <td class="col-duration">9.64</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Zones/GetZones
+({&#x27;name&#x27;: &#x27;Test_notification_Api631&#x27;, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;userIds&#x27;: [&#x27;6512826fe3534b7b91f740d0&#x27;], &#x27;caseGroupIdsUserIds&#x27;: [&#x27;6512d916be1891535e3bad19&#x27;], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d919be1891535e3bad2d&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d919be1891535e3bad2d was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api631&#x27;)
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:11 test_Notification_Groups_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_02</td>
+          <td class="col-duration">5.24</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api614&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d91ebe1891535e3bad4f&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d91ebe1891535e3bad4f was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api614&#x27;)
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:19 test_Notification_Groups_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_03</td>
+          <td class="col-duration">2.94</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, {&#x27;agroupinfo&#x27;: {&#x27;agroups&#x27;: [{&#x27;agroupID&#x27;: &#x27;6512b5d7be1891535e3b935d&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512d8d3be1891535e3babe3&#x27;, &#x27;name&#x27;: &#x27;GroupName&#x27;}], &#x27;desc&#x27;: &#x27;random&#x27;, &#x27;name&#x27;: &#x27;AA&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [{&#x27;userID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;userName&#x27;: &#x27;core&#x27;, &#x27;contact&#x27;: {&#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b69fbe1891535e3b93e2&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api132&#x27;, &#x27;ownerID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b6d3be1891535e3b9419&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test&#x27;, &#x27;name&#x27;: &#x27;Test835&#x27;, &#x27;ownerID&#x27;: &#x27;6509490800b0398858000031&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b704be1891535e3b9433&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;aa&#x27;, &#x27;name&#x27;: &#x27;Random&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b767be1891535e3b94a7&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api953&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [{&#x27;userID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;userName&#x27;: &#x27;core&#x27;, &#x27;contact&#x27;: {&#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b77dbe1891535e3b9514&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api294&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b799be1891535e3b959d&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512b797be1891535e3b9589&#x27;, &#x27;name&#x27;: &#x27;test enrollment254&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api846&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [{&#x27;userID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;userName&#x27;: &#x27;core&#x27;, &#x27;contact&#x27;: {&#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b7b6be1891535e3b95e0&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512b7b3be1891535e3b95cc&#x27;, &#x27;name&#x27;: &#x27;test enrollment260&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api738&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [{&#x27;userID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;userName&#x27;: &#x27;core&#x27;, &#x27;contact&#x27;: {&#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b7bbbe1891535e3b9602&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api278&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b7c3be1891535e3b9647&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api881&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b7cbbe1891535e3b968c&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;New Description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api369&#x27;, &#x27;ownerID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b7d6be1891535e3b96ea&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api487&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [{&#x27;userID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;userName&#x27;: &#x27;core&#x27;, &#x27;contact&#x27;: {&#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512b7e2be1891535e3b973e&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api745&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512bc67be1891535e3b995f&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test&#x27;, &#x27;name&#x27;: &#x27;Test501&#x27;, &#x27;ownerID&#x27;: &#x27;6509490800b0398858000031&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512bef9be1891535e3b9b10&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512a8a4be1891535e3b87cb&#x27;, &#x27;name&#x27;: &#x27;GroupName&#x27;}], &#x27;desc&#x27;: &#x27;b&#x27;, &#x27;name&#x27;: &#x27;bb&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512c097be1891535e3b9c44&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test&#x27;, &#x27;name&#x27;: &#x27;Test160&#x27;, &#x27;ownerID&#x27;: &#x27;6509490800b0398858000031&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512c484be1891535e3b9d06&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api785&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512cfffbe1891535e3ba433&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512cffbbe1891535e3ba410&#x27;, &#x27;name&#x27;: &#x27;test enrollment577&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api231&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512d027be1891535e3ba47b&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512d022be1891535e3ba458&#x27;, &#x27;name&#x27;: &#x27;test enrollment696&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api831&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512d8e9be1891535e3bacc9&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512d8e5be1891535e3baca6&#x27;, &#x27;name&#x27;: &#x27;test enrollment360&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api580&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512d919be1891535e3bad2d&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;6512d916be1891535e3bad19&#x27;, &#x27;name&#x27;: &#x27;test enrollment172&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api631&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [{&#x27;userID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;userName&#x27;: &#x27;core&#x27;, &#x27;contact&#x27;: {&#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}, {&#x27;agroupID&#x27;: &#x27;6512d91ebe1891535e3bad4f&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api614&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:27 test_Notification_Groups_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_04</td>
+          <td class="col-duration">7.43</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+(&lt;Response [200]&gt;, {&#x27;agroupinfo&#x27;: {&#x27;agroups&#x27;: [{&#x27;agroupID&#x27;: &#x27;6512d926be1891535e3badae&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api143&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;6512825eb5505c9518c38e94&#x27;]}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:35 test_Notification_Groups_Test_04  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_05</td>
+          <td class="col-duration">9.71</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api801&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d92ebe1891535e3bade4&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d92ebe1891535e3bade4 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api801&#x27;)
+6512d92ebe1891535e3bade4
+Test_notification_Api801
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups?Id=6512d92ebe1891535e3bade4
+response_list ({&#x27;agroupID&#x27;: &#x27;6512d92ebe1891535e3bade4&#x27;, &#x27;description&#x27;: &#x27;New Description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api801&#x27;, &#x27;ownerID&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d92ebe1891535e3bade4&#x27;, &#x27;message&#x27;: &#x27;Alert group 6512d92ebe1891535e3bade4 is updated.&#x27;, &#x27;isSuccess&#x27;: True})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:43 test_Notification_Groups_Test_05  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_06</td>
+          <td class="col-duration">12.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api688&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d93abe1891535e3bae3d&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d93abe1891535e3bae3d was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api688&#x27;)
+6512d93abe1891535e3bae3d
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups/addUserToAlertGroup
+request_data {&quot;agroupID&quot;: &quot;6512d93abe1891535e3bae3d&quot;, &quot;userId&quot;: &quot;6512826fe3534b7b91f740d0&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;6512826fe3534b7b91f740d0 user have been added to the alert group with id 6512d93abe1891535e3bae3d&#x27;}}
+response_list ({&#x27;agroupID&#x27;: &#x27;6512d93abe1891535e3bae3d&#x27;, &#x27;userId&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;}, &lt;Response [200]&gt;, {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;6512826fe3534b7b91f740d0 user have been added to the alert group with id 6512d93abe1891535e3bae3d&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:51 test_Notification_Groups_Test_06  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_07</td>
+          <td class="col-duration">16.35</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api712&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d946be1891535e3bae91&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d946be1891535e3bae91 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api712&#x27;)
+6512d946be1891535e3bae91
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups/addUserToAlertGroup
+request_data {&quot;agroupID&quot;: &quot;6512d946be1891535e3bae91&quot;, &quot;userId&quot;: &quot;6512826fe3534b7b91f740d0&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;6512826fe3534b7b91f740d0 user have been added to the alert group with id 6512d946be1891535e3bae91&#x27;}}
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups/removeUserFromAlertGroup
+request_data {&quot;agroupID&quot;: &quot;6512d946be1891535e3bae91&quot;, &quot;userId&quot;: &quot;6512826fe3534b7b91f740d0&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;6512826fe3534b7b91f740d0 user have been removed from alert group with id 6512d946be1891535e3bae91&#x27;}}
+response_list ({&#x27;agroupID&#x27;: &#x27;6512d946be1891535e3bae91&#x27;, &#x27;userId&#x27;: &#x27;6512826fe3534b7b91f740d0&#x27;}, &lt;Response [200]&gt;, {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;6512826fe3534b7b91f740d0 user have been removed from alert group with id 6512d946be1891535e3bae91&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:59 test_Notification_Groups_Test_07  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_08</td>
+          <td class="col-duration">9.67</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api582&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d954be1891535e3baef9&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d954be1891535e3baef9 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api582&#x27;)
+6512d954be1891535e3baef9
+response_list (&lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d954be1891535e3baef9&#x27;, &#x27;message&#x27;: &quot;The alert group &#x27;Test_notification_Api582&#x27; has been deleted (group ID was 6512d954be1891535e3baef9)&quot;, &#x27;isSuccess&#x27;: True})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:67 test_Notification_Groups_Test_08  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_09</td>
+          <td class="col-duration">9.87</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api525&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d95dbe1891535e3baf43&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d95dbe1891535e3baf43 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api525&#x27;)
+6512d95dbe1891535e3baf43
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+response_list ({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api525&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [500]&gt;, {&#x27;ExceptionType&#x27;: &#x27;FluentValidation.ValidationException&#x27;, &#x27;Message&#x27;: &#x27;An unhandled exception has occured while executing the request.&#x27;, &#x27;Data&#x27;: {&#x27;exceptionMessage&#x27;: &#x27;Validation failed: \r\n -- Name: Name already exists. Severity: Error&#x27;, &#x27;innerException&#x27;: None, &#x27;requestId&#x27;: &#x27;00-822592990170d3d66bad0337b91ba19c-2e657ab808b99531-00&#x27;, &#x27;requestPath&#x27;: &#x27;/api/AlertGroups&#x27;, &#x27;connectionId&#x27;: &#x27;0HMTUBVM2V1JV&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:75 test_Notification_Groups_Test_09  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_10</td>
+          <td class="col-duration">9.54</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/EnrollmentGroups/addAlertGroupCase
+request_data {&quot;CGroupID&quot;: &quot;6512d965be1891535e3baf73&quot;, &quot;AGroupID&quot;: &quot;6512d969be1891535e3baf96&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;1 enrollment groups have been added to the alert group with id = 6512d965be1891535e3baf73&#x27;}}
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api255&#x27;, &#x27;ownerID&#x27;: &#x27;6512825db5505c9518c38e90&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;6512d969be1891535e3baf96&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 6512d969be1891535e3baf96 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api255&#x27;)
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:83 test_Notification_Groups_Test_10  : Execution Started &gt;&gt;<br/></div></td></tr></tbody></table></body></html>

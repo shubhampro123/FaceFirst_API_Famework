@@ -3,10 +3,22 @@ from datetime import datetime
 import logging
 from pathlib import Path
 
+import requests
+
+from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
+from Config_Package.Excel_Config_Files import XLUtils
+
 
 class API_Base_Utilities:
+    Base_URL = "https://ff-india-qa10.eastus2.cloudapp.azure.com/"
 
-    Base_URL = "https://ff-india-qa11.eastus2.cloudapp.azure.com"
+    # API all Excel file path
+    report_excel_path = f"{Path(__file__).parent.parent.parent}{Read_API_Endpoints().get_report_sheet_path()}"
+    test_data_excel_path = f"{Path(__file__).parent.parent.parent}{Read_API_Endpoints().get_test_data_sheet_path()}"
+
+    # Sheet name
+    login_test_data_sheet_name = Read_API_Endpoints().get_login_test_data_sheet_name()
+    users_test_data_sheet_name = Read_API_Endpoints().users_test_data_sheet_name()
 
     @staticmethod
     def logger_object():
@@ -40,3 +52,64 @@ class API_Base_Utilities:
             return logger
         except Exception as ex:
             print(ex)
+
+
+# write all data in Excel
+
+def excel_result(row_no, test_case_id, body, json_res, status_code, validation, result, sheet_name):
+    actual_result = f"Response Status Code : {status_code} & Message : {validation}"
+    XLUtils.writeData(API_Base_Utilities.report_excel_path, sheet_name, row_no, 2, test_case_id)
+    XLUtils.writeData(API_Base_Utilities.report_excel_path, sheet_name, row_no, 4, body)
+    XLUtils.writeData(API_Base_Utilities.report_excel_path, sheet_name, row_no, 5,
+                      json_res)
+    XLUtils.writeData(API_Base_Utilities.report_excel_path, sheet_name, row_no, 8,
+                      actual_result)
+    if result:
+        XLUtils.result_pass(API_Base_Utilities.report_excel_path, sheet_name, row_no, 7)
+    else:
+        XLUtils.result_fail(API_Base_Utilities.report_excel_path, sheet_name, row_no, 7)
+
+
+# test case execution time count method
+def time_entry(row_no, time, sheet_name):
+    global start, end
+    if time == "start_time":
+        start = XLUtils.getCurrentTime()
+        XLUtils.writeData(API_Base_Utilities.report_excel_path, sheet_name, row_no, 9, start)
+    if time == "end_time":
+        end = XLUtils.getCurrentTime()
+        XLUtils.writeData(API_Base_Utilities.report_excel_path, sheet_name, row_no, 10, end)
+    if time == "total_time":
+        time_format = "%H:%M:%S"
+        datetime1 = datetime.strptime(start, time_format)
+        datetime2 = datetime.strptime(end, time_format)
+        time_difference = datetime2 - datetime1
+        seconds_difference = time_difference.total_seconds()
+        XLUtils.writeData(API_Base_Utilities.report_excel_path, sheet_name, row_no, 11,
+                          seconds_difference)
+
+
+def login_token():
+    row_no = 2
+    username = XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                 API_Base_Utilities.login_test_data_sheet_name, row_no, 3)
+    password = XLUtils.read_data(API_Base_Utilities.test_data_excel_path, API_Base_Utilities.login_test_data_sheet_name,
+                                 row_no, 4)
+    lat = XLUtils.read_data(API_Base_Utilities.test_data_excel_path, API_Base_Utilities.login_test_data_sheet_name,
+                            row_no, 5)
+    lon = XLUtils.read_data(API_Base_Utilities.test_data_excel_path, API_Base_Utilities.login_test_data_sheet_name,
+                            row_no, 6)
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_login_endpoint()}"
+    form_data = {"username": username, "password": password, "lat": lat, "lon": lon}
+    response_str = requests.post(url, form_data)
+    response_json = response_str.json()
+    token = response_json["result"]["token"]
+    return token
+
+
+def response_validation(response_data):
+    return int(response_data.status_code) == int(Read_API_Endpoints().get_success_response_code())
+
+
+def invalid_response_validation(response_data):
+    return int(response_data.status_code) == int(Read_API_Endpoints().internal_server_error())
