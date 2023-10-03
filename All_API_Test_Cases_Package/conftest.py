@@ -3,8 +3,8 @@ from datetime import datetime
 import logging
 from pathlib import Path
 
+import pytest
 import requests
-import self
 
 from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
 from Config_Package.Excel_Config_Files import XLUtils
@@ -20,6 +20,13 @@ class API_Base_Utilities:
     # Sheet name
     login_test_data_sheet_name = Read_API_Endpoints().get_login_test_data_sheet_name()
     users_test_data_sheet_name = Read_API_Endpoints().users_test_data_sheet_name()
+    logger = None
+
+    @classmethod
+    def get_logger(cls):
+        if cls.logger is None:
+            cls.logger = cls.logger_object()
+        return cls.logger
 
     @staticmethod
     def logger_object():
@@ -114,5 +121,3 @@ def response_validation(response_data):
 
 def invalid_response_validation(response_data):
     return int(response_data.status_code) == int(Read_API_Endpoints().internal_server_error())
-
-

@@ -320,3 +320,24 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def identify_enroll_test_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'identify_enroll_test_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def create_enrollment_endpoint(self):
+        try:
+            ele = self.config.get('IDENTIFY_ENROLL', 'create_enrollment_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def identify_enroll_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'identify_enroll_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+

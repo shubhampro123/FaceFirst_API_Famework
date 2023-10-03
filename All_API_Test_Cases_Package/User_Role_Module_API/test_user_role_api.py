@@ -1,10 +1,11 @@
-from API_Utilities.Api_Base import API_Base_Utilities
+
 from All_API_Methods_Package.User_Role_Module_API.User_Role_API_Methods import User_Role_API_Methods
+from All_API_Test_Cases_Package.conftest import API_Base_Utilities
 
 
 class Test_user_role_api(API_Base_Utilities):
 
-    logger = API_Base_Utilities.logger_object()
+    logger = API_Base_Utilities.get_logger()
 
     def test_user_role_Test_01(self):
         self.logger.info("test_Login_Test_01  : Execution Started >>")
