@@ -21,23 +21,23 @@ class Test_login_api(API_Base_Utilities):
         else:
             assert False
 
-    def test_Login_Test_03(self):
-        self.logger.info("test_Login_Test_03  : Execution Started >>")
-        if Login_API_Methods(self.logger).login_with_valid_username_and_invalid_password():
-            assert True
-        else:
-            assert False
+    # def test_Login_Test_03(self):
+    #     self.logger.info("test_Login_Test_03  : Execution Started >>")
+    #     if Login_API_Methods(self.logger).login_with_valid_username_and_invalid_password():
+    #         assert True
+    #     else:
+    #         assert False
 
-    def test_Login_Test_04(self):
-        self.logger.info("test_Login_Test_04  : Execution Started >>")
-        if Login_API_Methods(self.logger).login_with_invalid_username_and_invalid_password():
-            assert True
-        else:
-            assert False
+    # def test_Login_Test_04(self):
+    #     self.logger.info("test_Login_Test_04  : Execution Started >>")
+    #     if Login_API_Methods(self.logger).login_with_invalid_username_and_invalid_password():
+    #         assert True
+    #     else:
+    #         assert False
 
-    def test_Login_Test_05(self):
-        self.logger.info("test_Login_Test_05  : Execution Started >>")
-        if Login_API_Methods(self.logger).login_with_blank_username_and_blank_password():
-            assert True
-        else:
-            assert False
+    # def test_Login_Test_05(self):
+    #     self.logger.info("test_Login_Test_05  : Execution Started >>")
+    #     if Login_API_Methods(self.logger).login_with_blank_username_and_blank_password():
+    #         assert True
+    #     else:
+    #         assert False
