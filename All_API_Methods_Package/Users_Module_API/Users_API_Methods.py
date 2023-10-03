@@ -366,7 +366,7 @@ class Users_API_Methods:
             self.json_response = response_list[2]
             self.act_msg = self.json_response["status"]
             self.exp_msg = Read_Expected_users_Response_msg().user_create_msg()
-            act_username = self.json_response["username"]
+            act_username = self.json_response["userName"]
             exp_username = response_list[3]
             if response_validation(self.response) and self.act_msg == self.exp_msg and act_username == exp_username:
                 excel_result(self.row, "Test_07", self.r_body, self.json_response, self.response.status_code,
@@ -639,9 +639,9 @@ def user_create_request(row_no):
                  "region_id": select_region(), "username": f"{data[24]}{random_number()}", "password": data[25]}
     response_str = requests.post(url, form_data, headers=headers)
     response_json = response_str.json()
-    user_id = response_json["userID"]
-    account_id = response_json["accountID"]
-    username = response_json["username"]
+    user_id = response_json["userId"]
+    account_id = response_json["accountId"]
+    username = response_json["userName"]
     current_password = data[25]
     return form_data, response_str, response_json, user_id, account_id, username, current_password
 
