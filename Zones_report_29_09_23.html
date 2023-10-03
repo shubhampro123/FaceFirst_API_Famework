@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title>api_report.html</title>
+    <title>Zones_report_29_09_23.html</title>
     <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
   <body onLoad="init()">
     <script>/* This Source Code Form is subject to the terms of the Mozilla Public
@@ -252,13 +252,13 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
     notFoundMessage.hidden = !allRowsHidden;
 }
 </script>
-    <h1>api_report.html</h1>
-    <p>Report generated on 06-Sep-2023 at 17:26:10 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
+    <h1>Zones_report_29_09_23.html</h1>
+    <p>Report generated on 29-Sep-2023 at 12:58:39 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
     <h2>Environment</h2>
     <table id="environment">
       <tr>
         <td>JAVA_HOME</td>
-        <td>C:\Users\BAPS\Downloads\jdk-18_windows-x64_bin\jdk-18.0.2.1</td></tr>
+        <td>C:\Program Files\Java\jdk-17</td></tr>
       <tr>
         <td>Packages</td>
         <td>{"pluggy": "1.0.0", "pytest": "7.2.1"}</td></tr>
@@ -272,8 +272,8 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <td>Python</td>
         <td>3.11.4</td></tr></table>
     <h2>Summary</h2>
-    <p>3 tests ran in 3.97 seconds. </p>
-    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">3 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <p>2 tests ran in 12.19 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">2 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">0 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
       <thead id="results-table-head">
@@ -287,27 +287,20 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">All_API_Test_Cases_Package/test_Registration_api.py::Test_Registration_api::test_Registration_API_01</td>
-          <td class="col-duration">0.88</td>
+          <td class="col-name">All_API_Test_Cases_Package/Zones_Module_API/test_zones_api.py::Test_Zones_api::test_Zones_Test_01</td>
+          <td class="col-duration">3.65</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_Registration_api.py:11 test_Registration_API_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, {&#x27;zoneInfo&#x27;: {&#x27;zones&#x27;: [{&#x27;description&#x27;: &#x27;All Devices&#x27;, &#x27;isDefault&#x27;: True, &#x27;zoneId&#x27;: &#x27;65166d39e119836feb867cec&#x27;}, {&#x27;accountId&#x27;: &#x27;65166d39e119836feb867ce8&#x27;, &#x27;description&#x27;: &#x27;ff-india-qa10&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;65166dbed319a18d9ce09c00&#x27;, &#x27;regionId&#x27;: &#x27;65166d39e119836feb867cea&#x27;, &#x27;hostName&#x27;: &#x27;ff-india-qa10&#x27;}, {&#x27;accountId&#x27;: &#x27;65166d39e119836feb867ce8&#x27;, &#x27;description&#x27;: &#x27;DESKTOP-660P8Q2&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;651675e702302bffd7a8b90f&#x27;, &#x27;regionId&#x27;: &#x27;6516746002302bffd7a8b907&#x27;, &#x27;hostName&#x27;: &#x27;DESKTOP-660P8Q2&#x27;}, {&#x27;accountId&#x27;: &#x27;65166d39e119836feb867ce8&#x27;, &#x27;description&#x27;: &#x27;DESKTOP-75UBP18&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;6516760102302bffd7a8b910&#x27;, &#x27;regionId&#x27;: &#x27;651672ea02302bffd7a8b905&#x27;, &#x27;hostName&#x27;: &#x27;DESKTOP-75UBP18&#x27;}, {&#x27;accountId&#x27;: &#x27;65166d39e119836feb867ce8&#x27;, &#x27;description&#x27;: &#x27;DESKTOP-PTTAM1V&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;6516761c02302bffd7a8b911&#x27;, &#x27;regionId&#x27;: &#x27;6516732c02302bffd7a8b906&#x27;, &#x27;hostName&#x27;: &#x27;DESKTOP-PTTAM1V&#x27;}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_zones_api.py:9 test_Zones_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
-          <td class="col-name">All_API_Test_Cases_Package/test_Registration_api.py::Test_Registration_api::test_Registration_API_02</td>
-          <td class="col-duration">0.77</td>
+          <td class="col-name">All_API_Test_Cases_Package/Zones_Module_API/test_zones_api.py::Test_Zones_api::test_Zones_Test_02</td>
+          <td class="col-duration">7.48</td>
           <td class="col-links"></td></tr>
         <tr>
           <td class="extra" colspan="4">
-            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_Registration_api.py:18 test_Registration_API_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">All_API_Test_Cases_Package/test_Registration_api.py::Test_Registration_api::test_Registration_API_03</td>
-          <td class="col-duration">1.03</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="4">
-            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_Registration_api.py:25 test_Registration_API_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody></table></body></html>
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, {&#x27;zoneInfo&#x27;: {&#x27;zones&#x27;: [{&#x27;description&#x27;: &#x27;All Devices&#x27;, &#x27;isDefault&#x27;: True, &#x27;zoneId&#x27;: &#x27;65166d39e119836feb867cec&#x27;}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_zones_api.py:16 test_Zones_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody></table></body></html>
