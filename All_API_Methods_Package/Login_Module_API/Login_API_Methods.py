@@ -203,6 +203,7 @@ def login_request(row_no):
     form_data = {"username": username, "password": password, "lat": lat, "lon": lon}
     response_str = requests.post(url, form_data)
     response_json = response_str.json()
+    print(response_json)
     return url, response_str, response_json, form_data, username
 
 
