@@ -19,6 +19,9 @@ class API_Base_Utilities:
     # Sheet name
     login_test_data_sheet_name = Read_API_Endpoints().get_login_test_data_sheet_name()
     users_test_data_sheet_name = Read_API_Endpoints().users_test_data_sheet_name()
+    notification_groups_test_data_sheet_name = Read_API_Endpoints().notification_groups_test_data_sheet_name()
+    zones_test_data_sheet_name = Read_API_Endpoints().zones_test_data_sheet_name()
+    account_test_data_sheet_name = Read_API_Endpoints().account_test_data_sheet_name()
 
     @staticmethod
     def logger_object():
