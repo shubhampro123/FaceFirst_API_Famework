@@ -488,6 +488,55 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def get_profile_endpoint(self):
+        try:
+            ele = self.config.get('PROFILE', 'get_profile_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_profiles_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'get_enrollment_profiles_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def query_enrollment_info_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'query_enrollment_info_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def clear_enrollment_info_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'clear_enrollment_info_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def query_login_info_endpoint(self):
+        try:
+            ele = self.config.get('LOGIN', 'query_login_info_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def logout_endpoint(self):
+        try:
+            ele = self.config.get('LOGIN', 'logout_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def identify_enrollment_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'identify_enrollment_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def create_notes_endpoint(self):
         try:
             ele = self.config.get('NOTES', 'create_notes_endpoint')

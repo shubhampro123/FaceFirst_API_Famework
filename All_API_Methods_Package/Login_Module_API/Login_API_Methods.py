@@ -1,5 +1,5 @@
 import requests
-from API_Utilities.Api_Base import API_Base_Utilities, time_entry, excel_result
+from API_Utilities.Api_Base import API_Base_Utilities, time_entry, excel_result, login_token, login_Cookie
 from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
 from Config_Package.API_INI_Config_Files.Expected_Login_Response_Msg_read_ini import \
     Read_Expected_login_Response_msg
@@ -32,7 +32,7 @@ class Login_API_Methods:
             if response_validation(self.response) and self.act_msg == self.exp_msg:
                 excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg, True, self.sheet_name)
-                time_entry(self.row, "end_time",self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(True)
             else:
                 self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
@@ -136,7 +136,7 @@ class Login_API_Methods:
             if response_validation(self.response) and self.act_msg == self.exp_msg:
                 excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg, True, self.sheet_name)
-                time_entry(self.row, "end_time",self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(True)
             else:
                 self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
@@ -190,6 +190,104 @@ class Login_API_Methods:
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
             return False
 
+    def verify_get_login(self):
+        result = []
+        try:
+            self.row = 3
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = get_login_request()
+            self.response = response_list[0]
+            self.json_response = response_list[1]
+            if response_validation(self.response):
+                excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_Login_Test_02_Exception:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def verify_query_login_info(self):
+        result = []
+        try:
+            self.row = 4
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = get_query_login_info_request()
+            self.r_body = response_list[0]
+            self.response = response_list[1]
+            self.json_response = response_list[2]
+            self.act_msg = self.json_response["type"]
+            self.exp_msg = Read_Expected_login_Response_msg().query_login_msg()
+            if response_validation(self.response) and self.act_msg == self.exp_msg:
+                excel_result(self.row, "Test_03", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_03", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_03", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_Login_Test_03_Exception:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def verify_logout_request(self):
+        result = []
+        try:
+            self.row = 5
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = logout_request()
+            self.response = response_list[0]
+            self.json_response = response_list[1]
+            self.act_msg = self.json_response["data"]
+            self.exp_msg = Read_Expected_login_Response_msg().logout_success_msg()
+            if response_validation(self.response) and self.act_msg == self.exp_msg:
+                excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_Login_Test_04_Exception:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
             ################################### Generic method #################################
 
 
@@ -203,8 +301,32 @@ def login_request(row_no):
     form_data = {"username": username, "password": password, "lat": lat, "lon": lon}
     response_str = requests.post(url, form_data)
     response_json = response_str.json()
-    print(response_json)
     return url, response_str, response_json, form_data, username
+
+
+def get_login_request():
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_login_endpoint()}"
+    response_str = requests.get(url)
+    response_json = response_str.json()
+    return response_str, response_json
+
+
+def get_query_login_info_request():
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().query_login_info_endpoint()}"
+    query_params = {"byPassSSO": "false"}
+    response_str = requests.get(url, params=query_params)
+    response_json = response_str.json()
+    return query_params, response_str, response_json
+
+
+def logout_request():
+    token = login_token()
+    cookies = login_Cookie()
+    headers = {"Token": token, "Content-Type": "application/json; charset=utf-8", "Cookie": cookies}
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().logout_endpoint()}"
+    response_str = requests.post(url, headers=headers)
+    response_json = response_str.json()
+    return response_str, response_json
 
 
 # Get all data form Excel
