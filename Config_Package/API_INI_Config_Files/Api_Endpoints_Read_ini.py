@@ -537,3 +537,72 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def create_notes_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'create_notes_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def notes_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'notes_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def notes_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'notes_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def update_notes_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'update_notes_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_notes_endpoint(self, note_id):
+        try:
+            ele = self.config.get('NOTES', 'get_notes_endpoint')
+            return ele.format(note_id)
+        except Exception as ex:
+            print(ex)
+
+    def delete_notes_endpoint(self, note_id):
+        try:
+            ele = self.config.get('NOTES', 'delete_notes_endpoint')
+            return ele.format(note_id)
+        except Exception as ex:
+            print(ex)
+
+    def clear_notes_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'clear_notes_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def images_bulk_endpoint(self, note_id):
+        try:
+            ele = self.config.get('NOTES', 'images_bulk_endpoint')
+            return ele.format(note_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_images_endpoint(self, note_id):
+        try:
+            ele = self.config.get('NOTES', 'get_images_endpoint')
+            return ele.format(note_id)
+        except Exception as ex:
+            print(ex)
+
+    def delete_images_endpoint(self, note_id):
+        try:
+            ele = self.config.get('NOTES', 'delete_images_endpoint')
+            return ele.format(note_id)
+        except Exception as ex:
+            print(ex)

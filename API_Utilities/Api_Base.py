@@ -23,6 +23,7 @@ class API_Base_Utilities:
     notification_groups_test_data_sheet_name = Read_API_Endpoints().notification_groups_test_data_sheet_name()
     zones_test_data_sheet_name = Read_API_Endpoints().zones_test_data_sheet_name()
     account_test_data_sheet_name = Read_API_Endpoints().account_test_data_sheet_name()
+    notes_test_data_sheet_name = Read_API_Endpoints().notes_test_data_sheet_name()
 
     @staticmethod
     def logger_object():
