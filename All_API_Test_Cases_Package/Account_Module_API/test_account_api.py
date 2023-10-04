@@ -1,9 +1,10 @@
-from API_Utilities.Api_Base import API_Base_Utilities
+
 from All_API_Methods_Package.Account_Module_API.Account_API_Methods import Account_API_Methods
+from All_API_Test_Cases_Package.conftest import API_Base_Utilities
 
 
 class Test_Account_api(API_Base_Utilities):
-    logger = API_Base_Utilities.logger_object()
+    logger = API_Base_Utilities.get_logger()
 
     def test_Account_Test_01(self):
         self.logger.info("test_Account_Test_01  : Execution Started >>")

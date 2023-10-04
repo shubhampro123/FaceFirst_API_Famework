@@ -1,11 +1,12 @@
-from API_Utilities.Api_Base import API_Base_Utilities
+
 from All_API_Methods_Package.Notification_groups_Module_API.Notification_Groups_Methods import \
     Notification_Groups_API_Methods
+from All_API_Test_Cases_Package.conftest import API_Base_Utilities
 
 
 class Test_Notification_groups_api(API_Base_Utilities):
 
-    logger = API_Base_Utilities.logger_object()
+    logger = API_Base_Utilities.get_logger()
 
     def test_Notification_Groups_Test_01(self):
         self.logger.info("test_Notification_Groups_Test_01  : Execution Started >>")
