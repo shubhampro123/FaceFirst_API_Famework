@@ -320,6 +320,153 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def post_alert_groups_endpoint(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'post_alert_groups_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def notification_groups_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'notification_groups_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def notification_groups_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'notification_groups_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_all_alert_groups_endpoint(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'get_all_alert_groups_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_alert_group_using_ID(self,a_group_id):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'get_alert_group_using_ID')
+            return ele.format(a_group_id)
+        except Exception as ex:
+            print(ex)
+
+    def put_alert_group_ID(self,a_group_id):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'put_alert_group_ID')
+            return ele.format(a_group_id)
+        except Exception as ex:
+            print(ex)
+
+    def put_user_to_alert_group(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'put_user_to_alert_group')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def put_remove_user_from_alert_group(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'put_remove_user_from_alert_group')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_main_user_info(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'get_main_user_info')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_zone_id(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'get_zone_id')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def post_case_group(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'post_case_group')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def delete_alert_group(self,a_group_id):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'delete_alert_group')
+            return ele.format(a_group_id)
+        except Exception as ex:
+            print(ex)
+
+    def put_enrollment_group_to_alert_group(self):
+        try:
+            ele = self.config.get('NOTIFICATION_GROUPS', 'put_enrollment_group_to_alert_group')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_zone_by_id_endpoint(self,zone_id):
+        try:
+            ele = self.config.get('ZONES', 'get_zone_by_id_endpoint')
+            return ele.format(zone_id)
+        except Exception as ex:
+            print(ex)
+
+    def zones_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'zones_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def zones_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'zones_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_all_account_endpoint(self):
+        try:
+            ele = self.config.get('ACCOUNT', 'get_all_account_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_account_by_account_id_endpoint(self,account_id):
+        try:
+            ele = self.config.get('ACCOUNT', 'get_account_by_account_id_endpoint')
+            return ele.format(account_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_account_stations_by_account_id_endpoint(self,account_id):
+        try:
+            ele = self.config.get('ACCOUNT', 'get_account_stations_by_account_id_endpoint')
+            return ele.format(account_id)
+        except Exception as ex:
+            print(ex)
+
+    def account_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'account_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def account_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'account_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def identify_enroll_test_result_sheet_name(self):
         try:
             ele = self.config.get('TEST_RESULT_SHEET_NAME', 'identify_enroll_test_result_sheet_name')
