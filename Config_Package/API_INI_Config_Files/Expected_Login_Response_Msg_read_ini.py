@@ -46,3 +46,17 @@ class Read_Expected_login_Response_msg:
             return ele
         except Exception as ex:
             print(ex)
+
+    def query_login_msg(self):
+        try:
+            ele = self.config.get('MESSAGE', 'query_login_msg')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def logout_success_msg(self):
+        try:
+            ele = self.config.get('MESSAGE', 'logout_success_msg')
+            return ele
+        except Exception as ex:
+            print(ex)

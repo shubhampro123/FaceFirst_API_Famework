@@ -108,11 +108,27 @@ def login_token():
     return token
 
 
+def login_Cookie():
+    row_no = 2
+    username = XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                 API_Base_Utilities.login_test_data_sheet_name, row_no, 3)
+    password = XLUtils.read_data(API_Base_Utilities.test_data_excel_path, API_Base_Utilities.login_test_data_sheet_name,
+                                 row_no, 4)
+    lat = XLUtils.read_data(API_Base_Utilities.test_data_excel_path, API_Base_Utilities.login_test_data_sheet_name,
+                            row_no, 5)
+    lon = XLUtils.read_data(API_Base_Utilities.test_data_excel_path, API_Base_Utilities.login_test_data_sheet_name,
+                            row_no, 6)
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_login_endpoint()}"
+    form_data = {"username": username, "password": password, "lat": lat, "lon": lon}
+    response_str = requests.post(url, form_data)
+    response_json = response_str.json()
+    cookies = response_json["result"]["cookies"]
+    return cookies
+
+
 def response_validation(response_data):
     return int(response_data.status_code) == int(Read_API_Endpoints().get_success_response_code())
 
 
 def invalid_response_validation(response_data):
     return int(response_data.status_code) == int(Read_API_Endpoints().internal_server_error())
-
-
