@@ -278,9 +278,11 @@ def query_Enrollment_FaceInfo_request():
     token = login_token()
     headers = {"Token": token}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().query_enrollment_info_endpoint()}"
+    print(url)
     request_body = {"caseId": caseId}
     response_str = requests.get(url, params=request_body, headers=headers)
     response_json = response_str.json()
+    print(response_json)
     return request_body, response_str, response_json
 
 
