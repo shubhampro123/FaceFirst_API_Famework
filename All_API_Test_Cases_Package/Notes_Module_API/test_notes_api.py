@@ -33,26 +33,26 @@ class Test_notes_api(API_Base_Utilities):
         else:
             assert False
 
-    # def test_notes_Test_05(self):
-    #     self.logger.info("test_notes_Test_05  : Execution Started >>")
-    #     if Notes_API_Methods(self.logger).verify_clear_notes():
-    #         assert True
-    #     else:
-    #         assert False
-    #
-    # def test_notes_Test_06(self):
-    #     self.logger.info("test_notes_Test_06  : Execution Started >>")
-    #     if Notes_API_Methods(self.logger).verify_add_image_to_note_using_note_id():
-    #         assert True
-    #     else:
-    #         assert False
-    #
-    # def test_notes_Test_07(self):
-    #     self.logger.info("test_notes_Test_07  : Execution Started >>")
-    #     if Notes_API_Methods(self.logger).verify_get_image_using_note_id():
-    #         assert True
-    #     else:
-    #         assert False
+    def test_notes_Test_05(self):
+        self.logger.info("test_notes_Test_05  : Execution Started >>")
+        if Notes_API_Methods(self.logger).verify_clear_notes():
+            assert True
+        else:
+            assert False
+
+    def test_notes_Test_06(self):
+        self.logger.info("test_notes_Test_06  : Execution Started >>")
+        if Notes_API_Methods(self.logger).verify_add_image_to_note_using_note_id():
+            assert True
+        else:
+            assert False
+
+    def test_notes_Test_07(self):
+        self.logger.info("test_notes_Test_07  : Execution Started >>")
+        if Notes_API_Methods(self.logger).verify_get_image_using_note_id():
+            assert True
+        else:
+            assert False
     #
     # def test_notes_Test_08(self):
     #     self.logger.info("test_notes_Test_08  : Execution Started >>")

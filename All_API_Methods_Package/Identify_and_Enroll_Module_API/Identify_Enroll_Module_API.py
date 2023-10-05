@@ -216,6 +216,78 @@ class Identify_Enroll_API_Methods:
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
             return False
 
+    def verify_edit_enrollments(self):
+        result = []
+        try:
+            self.row = 8
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = edit_enrollment_request()
+            self.r_body = response_list[0]
+            self.response = response_list[1]
+            self.json_response = response_list[2]
+            enroll_id = response_list[3]
+            self.act_msg = self.json_response["message"]
+            self.exp_msg = Read_identify_enroll_Response_msg().edit_enrollment_success_msg(enroll_id)
+            if response_validation(self.response) and self.act_msg == self.exp_msg:
+                excel_result(self.row, "Test_07", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_07", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_07", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_enrollment_group_Test_07:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def verify_delete_enrollments(self):
+        result = []
+        try:
+            self.row = 9
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = delete_enrollment_request()
+            self.r_body = response_list[0]
+            self.response = response_list[1]
+            self.json_response = response_list[2]
+            enroll_id = response_list[3]
+            self.act_msg = self.json_response["message"]
+            self.exp_msg = Read_identify_enroll_Response_msg().delete_enrollment_success_msg(enroll_id)
+            if response_validation(self.response) and self.act_msg == self.act_msg:
+                excel_result(self.row, "Test_08", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_08", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_08", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_enrollment_group_Test_08:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+
+################################ Reuse Method #######################################
 
 def create_enrollment_request():
     token = login_token()
@@ -238,6 +310,42 @@ def create_enrollment_request():
     response_json = response_str.json()
     caseId = response_json["enroll"]["caseId"]
     return request_body, response_str, response_json, caseId
+
+
+def edit_enrollment_request():
+    enroll = create_enrollment_request()
+    caseId = enroll[3]
+    token = login_token()
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
+    headers = {"Token": token, "Content-Type": "application/json"}
+    data = edit_enrollment(10)
+    request_body = {"expiration": data[0], "cgroupId": get_C_group_Id(), "storeId": data[2], "caseNumber": data[3],
+                    "reportedLoss": data[4], "timeIncident": data[5], "action": data[6],
+                    "profileId": get_profile_id(), "optOut": data[8], "enabled": data[9], "image": data[10],
+                    "caseEventType": data[11], "activityType": data[12], "methodOffence": data[13],
+                    "reportedBy": data[14], "build": data[15], "bodyMarkings": data[16], "gender": data[17],
+                    "narrativeDesc": data[18], "heightType": data[19], "regionId": select_region(),
+                    "caseId": caseId, "setCgroups": data[22], "cgroupIds": [get_C_group_Id()],
+                    "basis": data[24]
+                    }
+    request_data = json.dumps(request_body)
+    response_str = requests.put(url, data=request_data, headers=headers)
+    response_json = response_str.json()
+    enroll_id = response_json["data"]
+    return request_body, response_str, response_json, enroll_id
+
+
+def delete_enrollment_request():
+    enroll = create_enrollment_request()
+    caseId = enroll[3]
+    token = login_token()
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
+    headers = {"Token": token}
+    params = {"caseId": caseId, "deleteAlerts": False}
+    response_str = requests.delete(url, headers=headers, params=params)
+    response_json = response_str.json()
+    enroll_id = response_json["data"]
+    return params, response_str, response_json, enroll_id
 
 
 def clear_enrollment_info_request():
@@ -364,6 +472,14 @@ def identify_enrollment_data(row_no):
 def identify_search_enrollment(row_no):
     data = []
     for x in range(3, 18):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().identify_enroll_test_data_sheet_name(), row_no, x))
+    return data
+
+
+def edit_enrollment(row_no):
+    data = []
+    for x in range(3, 28):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
                                       Read_API_Endpoints().identify_enroll_test_data_sheet_name(), row_no, x))
     return data

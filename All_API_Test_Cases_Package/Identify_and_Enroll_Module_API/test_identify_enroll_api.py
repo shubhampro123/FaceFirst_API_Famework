@@ -55,3 +55,19 @@ class Test_identify_enroll_api(API_Base_Utilities):
             assert True
         else:
             assert False
+
+    @pytest.mark.p1
+    def test_identify_enroll_Test_07(self):
+        self.logger.info("test_identify_enroll_Test_07  : Execution Started >>")
+        if Identify_Enroll_API_Methods(self.logger).verify_edit_enrollments():
+            assert True
+        else:
+            assert False
+
+    @pytest.mark.p1
+    def test_identify_enroll_Test_08(self):
+        self.logger.info("test_identify_enroll_Test_08  : Execution Started >>")
+        if Identify_Enroll_API_Methods(self.logger).verify_delete_enrollments():
+            assert True
+        else:
+            assert False
