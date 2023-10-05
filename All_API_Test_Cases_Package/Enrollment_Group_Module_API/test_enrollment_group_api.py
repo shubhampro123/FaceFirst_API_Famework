@@ -1,7 +1,6 @@
-
+from API_Utilities.Api_Base import API_Base_Utilities
 from All_API_Methods_Package.Enrollment_Group_Module_API.Enrollment_Group_API_Methods import \
     Enrollment_Group_API_Methods
-from All_API_Test_Cases_Package.conftest import API_Base_Utilities
 
 
 class Test_enrollment_group_api(API_Base_Utilities):

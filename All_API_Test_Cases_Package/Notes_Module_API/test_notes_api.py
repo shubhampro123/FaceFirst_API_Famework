@@ -1,5 +1,5 @@
+from API_Utilities.Api_Base import API_Base_Utilities
 from All_API_Methods_Package.Notes_Module_API.Notes_API_methods import Notes_API_Methods
-from All_API_Test_Cases_Package.conftest import API_Base_Utilities
 
 
 class Test_notes_api(API_Base_Utilities):

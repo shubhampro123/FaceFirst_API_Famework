@@ -24,6 +24,13 @@ class API_Base_Utilities:
     zones_test_data_sheet_name = Read_API_Endpoints().zones_test_data_sheet_name()
     account_test_data_sheet_name = Read_API_Endpoints().account_test_data_sheet_name()
     notes_test_data_sheet_name = Read_API_Endpoints().notes_test_data_sheet_name()
+    logger = None
+
+    @classmethod
+    def get_logger(cls):
+        if cls.logger is None:
+            cls.logger = cls.logger_object()
+        return cls.logger
 
     @staticmethod
     def logger_object():

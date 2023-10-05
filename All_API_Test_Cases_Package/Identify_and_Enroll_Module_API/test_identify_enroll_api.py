@@ -1,7 +1,8 @@
 import pytest
+
+from API_Utilities.Api_Base import API_Base_Utilities
 from All_API_Methods_Package.Identify_and_Enroll_Module_API.Identify_Enroll_Module_API import \
     Identify_Enroll_API_Methods
-from All_API_Test_Cases_Package.conftest import API_Base_Utilities
 
 
 class Test_identify_enroll_api(API_Base_Utilities):

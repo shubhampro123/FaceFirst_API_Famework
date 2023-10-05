@@ -1,6 +1,5 @@
-
+from API_Utilities.Api_Base import API_Base_Utilities
 from All_API_Methods_Package.Users_Module_API.Users_API_Methods import Users_API_Methods
-from All_API_Test_Cases_Package.conftest import API_Base_Utilities
 
 
 class Test_Users_api(API_Base_Utilities):
