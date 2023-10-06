@@ -166,6 +166,28 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def get_all_user_role_endpoint(self):
+        try:
+            ele = self.config.get('USER_ROLE', 'get_all_user_role_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def del_user_role_by_id_endpoint(self, value):
+        try:
+            ele = self.config.get('USER_ROLE', 'del_user_role_by_id_endpoint')
+            return ele.format(value)
+        except Exception as ex:
+            print(ex)
+
+    def update_user_role_endpoint(self):
+        try:
+            ele = self.config.get('USER_ROLE', 'update_user_role_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+
     def get_all_enrollment_group_endpoint(self):
         try:
             ele = self.config.get('ENROLLMENT_GROUP', 'get_all_enrollment_group_endpoint')
@@ -348,14 +370,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_alert_group_using_ID(self,a_group_id):
+    def get_alert_group_using_ID(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'get_alert_group_using_ID')
             return ele.format(a_group_id)
         except Exception as ex:
             print(ex)
 
-    def put_alert_group_ID(self,a_group_id):
+    def put_alert_group_ID(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'put_alert_group_ID')
             return ele.format(a_group_id)
@@ -397,7 +419,7 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def delete_alert_group(self,a_group_id):
+    def delete_alert_group(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'delete_alert_group')
             return ele.format(a_group_id)
@@ -411,7 +433,7 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_zone_by_id_endpoint(self,zone_id):
+    def get_zone_by_id_endpoint(self, zone_id):
         try:
             ele = self.config.get('ZONES', 'get_zone_by_id_endpoint')
             return ele.format(zone_id)
@@ -439,14 +461,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_account_by_account_id_endpoint(self,account_id):
+    def get_account_by_account_id_endpoint(self, account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_by_account_id_endpoint')
             return ele.format(account_id)
         except Exception as ex:
             print(ex)
 
-    def get_account_stations_by_account_id_endpoint(self,account_id):
+    def get_account_stations_by_account_id_endpoint(self, account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_stations_by_account_id_endpoint')
             return ele.format(account_id)
@@ -604,5 +626,82 @@ class Read_API_Endpoints:
         try:
             ele = self.config.get('NOTES', 'delete_images_endpoint')
             return ele.format(note_id)
+        except Exception as ex:
+            print(ex)
+
+    def detect_face_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'detect_face_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def detect_face_endpoint(self):
+        try:
+            ele = self.config.get('DETECT_FACE', 'detect_face_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def detect_face_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'detect_face_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_test_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'tags_test_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'tags_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'tags_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_endpoint(self):
+        try:
+            ele = self.config.get('TAGS', 'tags_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def create_tags_endpoint(self, name, serious_event, types):
+        try:
+            ele = self.config.get('TAGS', 'create_tags_endpoint')
+            return ele.format(name, serious_event, types)
+        except Exception as ex:
+            print(ex)
+
+    def get_tags_endpoint(self):
+        try:
+            ele = self.config.get('TAGS', 'get_tags_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def del_tags_by_id_endpoint(self, value):
+        try:
+            ele = self.config.get('TAGS', 'del_tags_by_id_endpoint')
+            return ele.format(value)
+        except Exception as ex:
+            print(ex)
+
+    def update_tags_endpoint(self):
+        try:
+            ele = self.config.get('TAGS', 'update_tags_endpoint')
+            return ele
         except Exception as ex:
             print(ex)
