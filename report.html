@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>report.html</title>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) { // eslint-disable-line no-redeclare
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function findAll(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sortColumn(elem) {
+    toggleSortStates(elem);
+    const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    let key;
+    if (elem.classList.contains('result')) {
+        key = keyResult;
+    } else if (elem.classList.contains('links')) {
+        key = keyLink;
+    } else {
+        key = keyAlpha;
+    }
+    sortTable(elem, key(colIndex));
+}
+
+function showAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(showExtras);
+}
+
+function hideAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(hideExtras);
+}
+
+function showExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.remove('collapsed');
+    expandcollapse.classList.remove('expander');
+    expandcollapse.classList.add('collapser');
+}
+
+function hideExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.add('collapsed');
+    expandcollapse.classList.remove('collapser');
+    expandcollapse.classList.add('expander');
+}
+
+function showFilters() {
+    let visibleString = getQueryParameter('visible') || 'all';
+    visibleString = visibleString.toLowerCase();
+    const checkedItems = visibleString.split(',');
+
+    const filterItems = document.getElementsByClassName('filter');
+    for (let i = 0; i < filterItems.length; i++) {
+        filterItems[i].hidden = false;
+
+        if (visibleString != 'all') {
+            filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
+            filterTable(filterItems[i]);
+        }
+    }
+}
+
+function addCollapse() {
+    // Add links for show/hide all
+    const resulttable = find('table#results-table');
+    const showhideall = document.createElement('p');
+    showhideall.innerHTML = '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+                            '<a href="javascript:hideAllExtras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    findAll('.col-result').forEach(function(elem) {
+        const collapsed = getQueryParameter('collapsed') || 'Passed';
+        const extras = elem.parentNode.nextElementSibling;
+        const expandcollapse = document.createElement('span');
+        if (extras.classList.contains('collapsed')) {
+            expandcollapse.classList.add('expander');
+        } else if (collapsed.includes(elem.innerHTML)) {
+            extras.classList.add('collapsed');
+            expandcollapse.classList.add('expander');
+        } else {
+            expandcollapse.classList.add('collapser');
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener('click', function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains('collapsed')) {
+                showExtras(event.currentTarget);
+            } else {
+                hideExtras(event.currentTarget);
+            }
+        });
+    });
+}
+
+function getQueryParameter(name) {
+    const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function init () { // eslint-disable-line no-unused-vars
+    resetSortHeaders();
+
+    addCollapse();
+
+    showFilters();
+
+    sortColumn(find('.initial-sort'));
+
+    findAll('.sortable').forEach(function(elem) {
+        elem.addEventListener('click',
+            function() {
+                sortColumn(elem);
+            }, false);
+    });
+}
+
+function sortTable(clicked, keyFunc) {
+    const rows = findAll('.results-table-row');
+    const reversed = !clicked.classList.contains('asc');
+    const sortedRows = sort(rows, keyFunc, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    const thead = document.getElementById('results-table-head');
+    document.getElementById('results-table').remove();
+    const parent = document.createElement('table');
+    parent.id = 'results-table';
+    parent.appendChild(thead);
+    sortedRows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName('BODY')[0].appendChild(parent);
+}
+
+function sort(items, keyFunc, reversed) {
+    const sortArray = items.map(function(item, i) {
+        return [keyFunc(item), i];
+    });
+
+    sortArray.sort(function(a, b) {
+        const keyA = a[0];
+        const keyB = b[0];
+
+        if (keyA == keyB) return 0;
+
+        if (reversed) {
+            return keyA < keyB ? 1 : -1;
+        } else {
+            return keyA > keyB ? 1 : -1;
+        }
+    });
+
+    return sortArray.map(function(item) {
+        const index = item[1];
+        return items[index];
+    });
+}
+
+function keyAlpha(colIndex) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[colIndex].firstChild.data.toLowerCase();
+    };
+}
+
+function keyLink(colIndex) {
+    return function(elem) {
+        const dataCell = elem.childNodes[1].childNodes[colIndex].firstChild;
+        return dataCell == null ? '' : dataCell.innerText.toLowerCase();
+    };
+}
+
+function keyResult(colIndex) {
+    return function(elem) {
+        const strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+            'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[colIndex].firstChild.data);
+    };
+}
+
+function resetSortHeaders() {
+    findAll('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    findAll('.sortable').forEach(function(elem) {
+        const icon = document.createElement('div');
+        icon.className = 'sort-icon';
+        icon.textContent = 'vvv';
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove('desc', 'active');
+        elem.classList.add('asc', 'inactive');
+    });
+}
+
+function toggleSortStates(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        resetSortHeaders();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function isAllRowsHidden(value) {
+    return value.hidden == false;
+}
+
+function filterTable(elem) { // eslint-disable-line no-unused-vars
+    const outcomeAtt = 'data-test-result';
+    const outcome = elem.getAttribute(outcomeAtt);
+    const classOutcome = outcome + ' results-table-row';
+    const outcomeRows = document.getElementsByClassName(classOutcome);
+
+    for(let i = 0; i < outcomeRows.length; i++){
+        outcomeRows[i].hidden = !elem.checked;
+    }
+
+    const rows = findAll('.results-table-row').filter(isAllRowsHidden);
+    const allRowsHidden = rows.length == 0 ? true : false;
+    const notFoundMessage = document.getElementById('not-found-message');
+    notFoundMessage.hidden = !allRowsHidden;
+}
+</script>
+    <h1>report.html</h1>
+    <p>Report generated on 05-Oct-2023 at 20:59:26 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>JAVA_HOME</td>
+        <td>C:\Program Files\Java\jdk-17</td></tr>
+      <tr>
+        <td>Packages</td>
+        <td>{"pluggy": "1.0.0", "pytest": "7.2.1"}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>Windows-10-10.0.19045-SP0</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{"allure-pytest": "2.12.0", "html": "3.2.0", "metadata": "2.0.4"}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.11.4</td></tr></table>
+    <h2>Summary</h2>
+    <p>63 tests ran in 1065.48 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">62 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">1 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable" col="duration">Duration</th>
+          <th class="sortable links" col="links">Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_05</td>
+          <td class="col-duration">33.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">self = &lt;All_API_Test_Cases_Package.Identify_and_Enroll_Module_API.test_identify_enroll_api.Test_identify_enroll_api object at 0x0000029040FE3C50&gt;<br/><br/>    @pytest.mark.p1<br/>    def test_identify_enroll_Test_05(self):<br/>        self.logger.info(&quot;test_identify_enroll_Test_05  : Execution Started &gt;&gt;&quot;)<br/>        if Identify_Enroll_API_Methods(self.logger).verify_identify_enrollment():<br/>            assert True<br/>        else:<br/>&gt;           assert False<br/><span class="error">E           assert False</span><br/><br/>All_API_Test_Cases_Package\Identify_and_Enroll_Module_API\test_identify_enroll_api.py:49: AssertionError<br/> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;ExceptionType&#x27;: &#x27;System.Exception&#x27;, &#x27;Message&#x27;: &#x27;An unhandled exception has occured while executing the request.&#x27;, &#x27;Data&#x27;: {&#x27;exceptionMessage&#x27;: &#x27;Enrollment id does not exist.&#x27;, &#x27;innerException&#x27;: None, &#x27;requestId&#x27;: &#x27;00-0cea1665f1075b9117f6479d30947a34-64be7ff0a96da3bd-00&#x27;, &#x27;requestPath&#x27;: &#x27;/api/Enrollments/identify&#x27;, &#x27;connectionId&#x27;: &#x27;0HMU5HMGR4O6E&#x27;}}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:45 test_identify_enroll_Test_05  : Execution Started &gt;&gt;
+INFO     root:Identify_Enroll_Module_API.py:170 actual_status_code = 500, expected_status_code = 200
+INFO     root:Identify_Enroll_Module_API.py:171 actual_message = None, expected_message = None<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Account_Module_API/test_account_api.py::Test_Account_api::test_Account_Test_01</td>
+          <td class="col-duration">8.39</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, [{&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;aGroupIDs&#x27;: [&#x27;651e6e5e4329bcab67b01b6e&#x27;, &#x27;651e9e447751dc6faf300368&#x27;, &#x27;651e9e4a7751dc6faf300378&#x27;, &#x27;651e9e537751dc6faf300396&#x27;, &#x27;651e9e667751dc6faf3003d8&#x27;, &#x27;651e9e757751dc6faf3003ff&#x27;, &#x27;651e9e907751dc6faf300455&#x27;, &#x27;651e9e9e7751dc6faf30047b&#x27;, &#x27;651ec9357751dc6faf3017cf&#x27;, &#x27;651ec9407751dc6faf3017e3&#x27;, &#x27;651ec9507751dc6faf301815&#x27;, &#x27;651ec9757751dc6faf301893&#x27;, &#x27;651ec98c7751dc6faf3018bc&#x27;, &#x27;651ec9b97751dc6faf301912&#x27;, &#x27;651ec9db7751dc6faf30193a&#x27;], &#x27;authParams&#x27;: &#x27;&#x27;, &#x27;authType&#x27;: 0, &#x27;autoThreshold&#x27;: 0.83, &#x27;caseTTL&#x27;: 0, &#x27;contact&#x27;: {&#x27;address1&#x27;: &#x27;&#x27;, &#x27;address2&#x27;: &#x27;&#x27;, &#x27;city&#x27;: &#x27;&#x27;, &#x27;company&#x27;: &#x27;&#x27;, &#x27;department&#x27;: &#x27;&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;, &#x27;faxNumber&#x27;: &#x27;&#x27;, &#x27;firstName&#x27;: &#x27;Company&#x27;, &#x27;homePhone&#x27;: &#x27;&#x27;, &#x27;lastName&#x27;: &#x27;Account&#x27;, &#x27;middleName&#x27;: &#x27;&#x27;, &#x27;state&#x27;: &#x27;&#x27;, &#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;title&#x27;: &#x27;&#x27;, &#x27;workPhone&#x27;: &#x27;&#x27;, &#x27;zip&#x27;: &#x27;&#x27;}, &#x27;enabled&#x27;: True, &#x27;cGroupIDs&#x27;: [&#x27;651e6e5e4329bcab67b01b67&#x27;, &#x27;651e9d1a7751dc6faf2fffe3&#x27;, &#x27;651e9d247751dc6faf2ffff2&#x27;, &#x27;651e9d2e7751dc6faf300004&#x27;, &#x27;651e9d3f7751dc6faf300029&#x27;, &#x27;651e9d487751dc6faf300045&#x27;, &#x27;651e9d527751dc6faf300063&#x27;, &#x27;651e9d5d7751dc6faf300086&#x27;, &#x27;651e9d667751dc6faf3000a9&#x27;, &#x27;651e9d747751dc6faf3000cd&#x27;, &#x27;651e9d817751dc6faf3000f6&#x27;, &#x27;651e9d997751dc6faf30012d&#x27;, &#x27;651e9dae7751dc6faf300171&#x27;, &#x27;651e9dc17751dc6faf3001b2&#x27;, &#x27;651e9dd87751dc6faf3001ef&#x27;, &#x27;651e9df37751dc6faf300240&#x27;, &#x27;651e9e027751dc6faf300277&#x27;, &#x27;651e9e427751dc6faf30035d&#x27;, &#x27;651e9e997751dc6faf30046a&#x27;, &#x27;651e9f5c7751dc6faf30060c&#x27;, &#x27;651e9f737751dc6faf300656&#x27;, &#x27;651e9f787751dc6faf30066f&#x27;, &#x27;651e9f7d7751dc6faf3006a2&#x27;, &#x27;651e9f8b7751dc6faf3006e4&#x27;, &#x27;651e9f957751dc6faf30070c&#x27;, &#x27;651e9f9e7751dc6faf30072a&#x27;, &#x27;651e9fab7751dc6faf30075d&#x27;, &#x27;651e9fb67751dc6faf300790&#x27;, &#x27;651e9fc07751dc6faf3007c4&#x27;, &#x27;651ea81a7751dc6faf3009cd&#x27;, &#x27;651ea82d7751dc6faf300a04&#x27;, &#x27;651ea83c7751dc6faf300a2c&#x27;, &#x27;651ea8917751dc6faf300a4e&#x27;, &#x27;651ea8a67751dc6faf300a85&#x27;, &#x27;651ea8b57751dc6faf300aad&#x27;, &#x27;651ea8de7751dc6faf300acf&#x27;, &#x27;651ea8f27751dc6faf300b06&#x27;, &#x27;651ea9027751dc6faf300b2e&#x27;, &#x27;651ea91e7751dc6faf300b50&#x27;, &#x27;651ea9307751dc6faf300b87&#x27;, &#x27;651ea93e7751dc6faf300baf&#x27;, &#x27;651eaa967751dc6faf300bda&#x27;, &#x27;651eaaa97751dc6faf300c11&#x27;, &#x27;651eaab87751dc6faf300c39&#x27;, &#x27;651ead617751dc6faf300c67&#x27;, &#x27;651ead8d7751dc6faf300cac&#x27;, &#x27;651eae427751dc6faf300cf1&#x27;, &#x27;651eb3797751dc6faf300d74&#x27;, &#x27;651eb38a7751dc6faf300dab&#x27;, &#x27;651eb3957751dc6faf300dd3&#x27;, &#x27;651ec6cf7751dc6faf30122e&#x27;, &#x27;651ec6dd7751dc6faf30123d&#x27;, &#x27;651ec6ed7751dc6faf30124f&#x27;, &#x27;651ec70a7751dc6faf301274&#x27;, &#x27;651ec71d7751dc6faf30129a&#x27;, &#x27;651ec7327751dc6faf3012c1&#x27;, &#x27;651ec7497751dc6faf3012f4&#x27;, &#x27;651ec75f7751dc6faf30131d&#x27;, &#x27;651ec7727751dc6faf30135f&#x27;, &#x27;651ec78d7751dc6faf3013a7&#x27;, &#x27;651ec7ae7751dc6faf3013e9&#x27;, &#x27;651ec7cc7751dc6faf301432&#x27;, &#x27;651ec7ea7751dc6faf30147f&#x27;, &#x27;651ec80a7751dc6faf3014c6&#x27;, &#x27;651ec8267751dc6faf301512&#x27;, &#x27;651ec83e7751dc6faf301551&#x27;, &#x27;651ec8517751dc6faf301580&#x27;, &#x27;651ec8687751dc6faf3015c1&#x27;, &#x27;651ec8787751dc6faf3015e9&#x27;, &#x27;651ec88a7751dc6faf30161f&#x27;, &#x27;651ec9327751dc6faf3017c4&#x27;, &#x27;651ec9d27751dc6faf301929&#x27;, &#x27;651ecf1d7751dc6faf301dce&#x27;, &#x27;651ecfd27751dc6faf301e16&#x27;], &#x27;maxEnrollments&#x27;: 1000000, &#x27;maxFaceNoteTimeDiff&#x27;: &#x27;1800&#x27;, &#x27;maxInvestigationLength&#x27;: 1800, &#x27;maxSubusers&#x27;: 100, &#x27;maxTransactionAge&#x27;: 86400, &#x27;numCases&#x27;: 30, &#x27;sessionExpiration&#x27;: 3600, &#x27;stationIDs&#x27;: [&#x27;DESKTOP-75UBP18:x01&#x27;, &#x27;DESKTOP-660P8Q2:x01&#x27;, &#x27;DESKTOP-PTTAM1V:x01&#x27;], &#x27;userIDs&#x27;: [&#x27;651e6e58977a0183e7460ed2&#x27;, &#x27;651e6e5e4329bcab67b01b59&#x27;, &#x27;651e6e5e4329bcab67b01b77&#x27;, &#x27;651e6ed1694c7c51a9b4a7f4&#x27;, &#x27;651e6ed2694c7c51a9b4a7f6&#x27;, &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;651e9eaa7751dc6faf30049b&#x27;, &#x27;651e9eb17751dc6faf3004b0&#x27;, &#x27;651e9eba7751dc6faf3004c5&#x27;, &#x27;651e9ec27751dc6faf3004da&#x27;, &#x27;651e9ed27751dc6faf300502&#x27;, &#x27;651e9eda7751dc6faf300517&#x27;, &#x27;651e9ee97751dc6faf300544&#x27;, &#x27;651ec4047751dc6faf3011a8&#x27;, &#x27;651ec9ef7751dc6faf30195a&#x27;, &#x27;651ec9fc7751dc6faf301979&#x27;, &#x27;651eca0c7751dc6faf301995&#x27;, &#x27;651eca187751dc6faf3019aa&#x27;, &#x27;651eca417751dc6faf3019dc&#x27;, &#x27;651eca557751dc6faf301a0f&#x27;, &#x27;651eca6f7751dc6faf301a4c&#x27;]}])
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_account_api.py:9 test_Account_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Account_Module_API/test_account_api.py::Test_Account_api::test_Account_Test_02</td>
+          <td class="col-duration">11.47</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, {&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;aGroupIDs&#x27;: [&#x27;651e6e5e4329bcab67b01b6e&#x27;, &#x27;651e9e447751dc6faf300368&#x27;, &#x27;651e9e4a7751dc6faf300378&#x27;, &#x27;651e9e537751dc6faf300396&#x27;, &#x27;651e9e667751dc6faf3003d8&#x27;, &#x27;651e9e757751dc6faf3003ff&#x27;, &#x27;651e9e907751dc6faf300455&#x27;, &#x27;651e9e9e7751dc6faf30047b&#x27;, &#x27;651ec9357751dc6faf3017cf&#x27;, &#x27;651ec9407751dc6faf3017e3&#x27;, &#x27;651ec9507751dc6faf301815&#x27;, &#x27;651ec9757751dc6faf301893&#x27;, &#x27;651ec98c7751dc6faf3018bc&#x27;, &#x27;651ec9b97751dc6faf301912&#x27;, &#x27;651ec9db7751dc6faf30193a&#x27;], &#x27;authParams&#x27;: &#x27;&#x27;, &#x27;authType&#x27;: 0, &#x27;autoThreshold&#x27;: 0.83, &#x27;caseTTL&#x27;: 0, &#x27;contact&#x27;: {&#x27;address1&#x27;: &#x27;&#x27;, &#x27;address2&#x27;: &#x27;&#x27;, &#x27;city&#x27;: &#x27;&#x27;, &#x27;company&#x27;: &#x27;&#x27;, &#x27;department&#x27;: &#x27;&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;, &#x27;faxNumber&#x27;: &#x27;&#x27;, &#x27;firstName&#x27;: &#x27;Company&#x27;, &#x27;homePhone&#x27;: &#x27;&#x27;, &#x27;lastName&#x27;: &#x27;Account&#x27;, &#x27;middleName&#x27;: &#x27;&#x27;, &#x27;state&#x27;: &#x27;&#x27;, &#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;title&#x27;: &#x27;&#x27;, &#x27;workPhone&#x27;: &#x27;&#x27;, &#x27;zip&#x27;: &#x27;&#x27;}, &#x27;enabled&#x27;: True, &#x27;cGroupIDs&#x27;: [&#x27;651e6e5e4329bcab67b01b67&#x27;, &#x27;651e9d1a7751dc6faf2fffe3&#x27;, &#x27;651e9d247751dc6faf2ffff2&#x27;, &#x27;651e9d2e7751dc6faf300004&#x27;, &#x27;651e9d3f7751dc6faf300029&#x27;, &#x27;651e9d487751dc6faf300045&#x27;, &#x27;651e9d527751dc6faf300063&#x27;, &#x27;651e9d5d7751dc6faf300086&#x27;, &#x27;651e9d667751dc6faf3000a9&#x27;, &#x27;651e9d747751dc6faf3000cd&#x27;, &#x27;651e9d817751dc6faf3000f6&#x27;, &#x27;651e9d997751dc6faf30012d&#x27;, &#x27;651e9dae7751dc6faf300171&#x27;, &#x27;651e9dc17751dc6faf3001b2&#x27;, &#x27;651e9dd87751dc6faf3001ef&#x27;, &#x27;651e9df37751dc6faf300240&#x27;, &#x27;651e9e027751dc6faf300277&#x27;, &#x27;651e9e427751dc6faf30035d&#x27;, &#x27;651e9e997751dc6faf30046a&#x27;, &#x27;651e9f5c7751dc6faf30060c&#x27;, &#x27;651e9f737751dc6faf300656&#x27;, &#x27;651e9f787751dc6faf30066f&#x27;, &#x27;651e9f7d7751dc6faf3006a2&#x27;, &#x27;651e9f8b7751dc6faf3006e4&#x27;, &#x27;651e9f957751dc6faf30070c&#x27;, &#x27;651e9f9e7751dc6faf30072a&#x27;, &#x27;651e9fab7751dc6faf30075d&#x27;, &#x27;651e9fb67751dc6faf300790&#x27;, &#x27;651e9fc07751dc6faf3007c4&#x27;, &#x27;651ea81a7751dc6faf3009cd&#x27;, &#x27;651ea82d7751dc6faf300a04&#x27;, &#x27;651ea83c7751dc6faf300a2c&#x27;, &#x27;651ea8917751dc6faf300a4e&#x27;, &#x27;651ea8a67751dc6faf300a85&#x27;, &#x27;651ea8b57751dc6faf300aad&#x27;, &#x27;651ea8de7751dc6faf300acf&#x27;, &#x27;651ea8f27751dc6faf300b06&#x27;, &#x27;651ea9027751dc6faf300b2e&#x27;, &#x27;651ea91e7751dc6faf300b50&#x27;, &#x27;651ea9307751dc6faf300b87&#x27;, &#x27;651ea93e7751dc6faf300baf&#x27;, &#x27;651eaa967751dc6faf300bda&#x27;, &#x27;651eaaa97751dc6faf300c11&#x27;, &#x27;651eaab87751dc6faf300c39&#x27;, &#x27;651ead617751dc6faf300c67&#x27;, &#x27;651ead8d7751dc6faf300cac&#x27;, &#x27;651eae427751dc6faf300cf1&#x27;, &#x27;651eb3797751dc6faf300d74&#x27;, &#x27;651eb38a7751dc6faf300dab&#x27;, &#x27;651eb3957751dc6faf300dd3&#x27;, &#x27;651ec6cf7751dc6faf30122e&#x27;, &#x27;651ec6dd7751dc6faf30123d&#x27;, &#x27;651ec6ed7751dc6faf30124f&#x27;, &#x27;651ec70a7751dc6faf301274&#x27;, &#x27;651ec71d7751dc6faf30129a&#x27;, &#x27;651ec7327751dc6faf3012c1&#x27;, &#x27;651ec7497751dc6faf3012f4&#x27;, &#x27;651ec75f7751dc6faf30131d&#x27;, &#x27;651ec7727751dc6faf30135f&#x27;, &#x27;651ec78d7751dc6faf3013a7&#x27;, &#x27;651ec7ae7751dc6faf3013e9&#x27;, &#x27;651ec7cc7751dc6faf301432&#x27;, &#x27;651ec7ea7751dc6faf30147f&#x27;, &#x27;651ec80a7751dc6faf3014c6&#x27;, &#x27;651ec8267751dc6faf301512&#x27;, &#x27;651ec83e7751dc6faf301551&#x27;, &#x27;651ec8517751dc6faf301580&#x27;, &#x27;651ec8687751dc6faf3015c1&#x27;, &#x27;651ec8787751dc6faf3015e9&#x27;, &#x27;651ec88a7751dc6faf30161f&#x27;, &#x27;651ec9327751dc6faf3017c4&#x27;, &#x27;651ec9d27751dc6faf301929&#x27;, &#x27;651ecf1d7751dc6faf301dce&#x27;, &#x27;651ecfd27751dc6faf301e16&#x27;], &#x27;maxEnrollments&#x27;: 1000000, &#x27;maxFaceNoteTimeDiff&#x27;: &#x27;1800&#x27;, &#x27;maxInvestigationLength&#x27;: 1800, &#x27;maxSubusers&#x27;: 100, &#x27;maxTransactionAge&#x27;: 86400, &#x27;numCases&#x27;: 30, &#x27;sessionExpiration&#x27;: 3600, &#x27;stationIDs&#x27;: [&#x27;DESKTOP-75UBP18:x01&#x27;, &#x27;DESKTOP-660P8Q2:x01&#x27;, &#x27;DESKTOP-PTTAM1V:x01&#x27;], &#x27;userIDs&#x27;: [&#x27;651e6e58977a0183e7460ed2&#x27;, &#x27;651e6e5e4329bcab67b01b59&#x27;, &#x27;651e6e5e4329bcab67b01b77&#x27;, &#x27;651e6ed1694c7c51a9b4a7f4&#x27;, &#x27;651e6ed2694c7c51a9b4a7f6&#x27;, &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;651e9eaa7751dc6faf30049b&#x27;, &#x27;651e9eb17751dc6faf3004b0&#x27;, &#x27;651e9eba7751dc6faf3004c5&#x27;, &#x27;651e9ec27751dc6faf3004da&#x27;, &#x27;651e9ed27751dc6faf300502&#x27;, &#x27;651e9eda7751dc6faf300517&#x27;, &#x27;651e9ee97751dc6faf300544&#x27;, &#x27;651ec4047751dc6faf3011a8&#x27;, &#x27;651ec9ef7751dc6faf30195a&#x27;, &#x27;651ec9fc7751dc6faf301979&#x27;, &#x27;651eca0c7751dc6faf301995&#x27;, &#x27;651eca187751dc6faf3019aa&#x27;, &#x27;651eca417751dc6faf3019dc&#x27;, &#x27;651eca557751dc6faf301a0f&#x27;, &#x27;651eca6f7751dc6faf301a4c&#x27;]})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_account_api.py:16 test_Account_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Account_Module_API/test_account_api.py::Test_Account_api::test_Account_Test_03</td>
+          <td class="col-duration">13.29</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>account_id 651e6e4dd10453bbc689ec05
+(&lt;Response [200]&gt;, {&#x27;stationInfo&#x27;: {&#x27;stations&#x27;: [{&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;geo&#x27;: {&#x27;type&#x27;: &#x27;Point&#x27;, &#x27;coordinates&#x27;: [93.90626879999999, 24.6637173]}, &#x27;desc&#x27;: &#x27;DESKTOP-75UBP18-8562/v2&#x27;, &#x27;stream&#x27;: &#x27;DESKTOP-75UBP18:x01&#x27;, &#x27;licActive&#x27;: 1696500858178, &#x27;zoneIDs&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;, &#x27;651e8b8d1b0bb59180354883&#x27;], &#x27;regionId&#x27;: &#x27;651e7a9f1b0bb591803547eb&#x27;}, {&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;geo&#x27;: {&#x27;type&#x27;: &#x27;Point&#x27;, &#x27;coordinates&#x27;: [78.36166349999999, 17.5039154]}, &#x27;desc&#x27;: &#x27;DESKTOP-660P8Q2-8561/v2&#x27;, &#x27;stream&#x27;: &#x27;DESKTOP-660P8Q2:x01&#x27;, &#x27;licActive&#x27;: 1696500528920, &#x27;zoneIDs&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;, &#x27;651e8b121b0bb5918035486f&#x27;], &#x27;regionId&#x27;: &#x27;651e796b1b0bb591803547ea&#x27;}, {&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;geo&#x27;: {&#x27;type&#x27;: &#x27;Point&#x27;, &#x27;coordinates&#x27;: [73.8567437, 18.5204303]}, &#x27;desc&#x27;: &#x27;DESKTOP-PTTAM1V-8563/v2&#x27;, &#x27;stream&#x27;: &#x27;DESKTOP-PTTAM1V:x01&#x27;, &#x27;licActive&#x27;: 1696501053193, &#x27;zoneIDs&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;, &#x27;651e8d191b0bb59180354897&#x27;], &#x27;regionId&#x27;: &#x27;651e7b8c1b0bb591803547ec&#x27;}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_account_api.py:23 test_Account_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_01</td>
+          <td class="col-duration">7.69</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>True
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:10 test_enrollment_group_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_02</td>
+          <td class="col-duration">10.24</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:17 test_enrollment_group_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_03</td>
+          <td class="col-duration">12.23</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:24 test_enrollment_group_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_04</td>
+          <td class="col-duration">17.62</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:31 test_enrollment_group_Test_04  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_05</td>
+          <td class="col-duration">11.28</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:38 test_enrollment_group_Test_05  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_06</td>
+          <td class="col-duration">14.59</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:45 test_enrollment_group_Test_06  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_07</td>
+          <td class="col-duration">15.76</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:52 test_enrollment_group_Test_07  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_08</td>
+          <td class="col-duration">15.77</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:59 test_enrollment_group_Test_08  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_09</td>
+          <td class="col-duration">20.43</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:66 test_enrollment_group_Test_09  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_10</td>
+          <td class="col-duration">14.76</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>651ed2d57751dc6faf301f55
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/EnrollmentGroups/addAlertGroupCase
+{&quot;CGroupID&quot;: &quot;651ed2d57751dc6faf301f55&quot;, &quot;AGroupID&quot;: &quot;651e6e5e4329bcab67b01b6e&quot;}
+{&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;1 enrollment groups have been added to the alert group with id = 651ed2d57751dc6faf301f55&#x27;}}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:73 test_enrollment_group_Test_10  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Enrollment_Group_Module_API/test_enrollment_group_api.py::Test_enrollment_group_api::test_enrollment_group_Test_11</td>
+          <td class="col-duration">19.33</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>651ed2e57751dc6faf301f99
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/EnrollmentGroups/addAlertGroupCase
+{&quot;CGroupID&quot;: &quot;651ed2e57751dc6faf301f99&quot;, &quot;AGroupID&quot;: &quot;651e6e5e4329bcab67b01b6e&quot;}
+{&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;1 enrollment groups have been added to the alert group with id = 651ed2e57751dc6faf301f99&#x27;}}
+{&quot;CGroupID&quot;: &quot;651ed2e57751dc6faf301f99&quot;, &quot;AGroupID&quot;: &quot;651e6e5e4329bcab67b01b6e&quot;}
+{&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;1 enrollment groups have been removed from the alert group with id = 651ed2e57751dc6faf301f99&#x27;}}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_enrollment_group_api.py:80 test_enrollment_group_Test_11  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_01</td>
+          <td class="col-duration">37.02</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:13 test_identify_enroll_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_02</td>
+          <td class="col-duration">29.29</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:21 test_identify_enroll_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_03</td>
+          <td class="col-duration">32.11</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Enrollments/queryEnrollmentFaceInfo
+{&#x27;faceInfo&#x27;: {&#x27;caseId&#x27;: &#x27;651ed34b7751dc6faf30207d&#x27;, &#x27;faces&#x27;: [{&#x27;confidence&#x27;: 0.9980553388595581, &#x27;create&#x27;: 0, &#x27;eyelx&#x27;: 86.5, &#x27;eyely&#x27;: 109.5, &#x27;eyerx&#x27;: 52.5, &#x27;eyery&#x27;: 116.5, &#x27;faceId&#x27;: &#x27;11f0c98574b4230dffc83c0aeb478f7b&#x27;, &#x27;maskedFace&#x27;: 0.19413532316684723, &#x27;ncases&#x27;: 25, &#x27;nonMaskedFace&#x27;: 0.805864691734314, &#x27;update&#x27;: 1696518988573, &#x27;geocode&#x27;: []}]}}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:29 test_identify_enroll_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_04</td>
+          <td class="col-duration">30.89</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:37 test_identify_enroll_Test_04  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_06</td>
+          <td class="col-duration">44.48</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;caseInfo&#x27;: {&#x27;cases&#x27;: [], &#x27;page&#x27;: {&#x27;totalCount&#x27;: 0, &#x27;subSetStart&#x27;: 0, &#x27;subSetCount&#x27;: 20}}}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:53 test_identify_enroll_Test_06  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_07</td>
+          <td class="col-duration">65.17</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:61 test_identify_enroll_Test_07  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Identify_and_Enroll_Module_API/test_identify_enroll_api.py::Test_identify_enroll_api::test_identify_enroll_Test_08</td>
+          <td class="col-duration">31.45</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_identify_enroll_api.py:69 test_identify_enroll_Test_08  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Login_Module_API/test_login_api.py::Test_login_api::test_Login_Test_01</td>
+          <td class="col-duration">4.55</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_login_api.py:12 test_Login_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Login_Module_API/test_login_api.py::Test_login_api::test_Login_Test_02</td>
+          <td class="col-duration">5.33</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_login_api.py:20 test_Login_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Login_Module_API/test_login_api.py::Test_login_api::test_Login_Test_03</td>
+          <td class="col-duration">4.09</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_login_api.py:28 test_Login_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Login_Module_API/test_login_api.py::Test_login_api::test_Login_Test_04</td>
+          <td class="col-duration">9.80</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_login_api.py:36 test_Login_Test_04  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Login_Module_API/test_login_api.py::Test_login_api::test_Login_Test_05</td>
+          <td class="col-duration">5.11</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_login_api.py:44 test_Login_Test_05  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notes_Module_API/test_notes_api.py::Test_notes_api::test_notes_Test_01</td>
+          <td class="col-duration">11.19</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;gender&#x27;: &#x27;MALE&#x27;, &#x27;build&#x27;: &#x27;build&#x27;, &#x27;bodyMarkings&#x27;: &#x27;mole&#x27;, &#x27;narrativeDesc&#x27;: &#x27;nsarra&#x27;, &#x27;action&#x27;: &#x27;Call Police&#x27;, &#x27;storeId&#x27;: &#x27;Pune&#x27;, &#x27;caseNumber&#x27;: &#x27;theft one bottle&#x27;, &#x27;timeIncident&#x27;: &#x27;09/21/2023 07:47&#x27;, &#x27;reportedBy&#x27;: &#x27;staff&#x27;, &#x27;reportedLoss&#x27;: 8000, &#x27;caseEventType&#x27;: &#x27;STORE THREAT&#x27;, &#x27;activityType&#x27;: &#x27;DOMESTIC VIOLENCE&#x27;, &#x27;heightType&#x27;: &#x27;5.6-5.9&#x27;, &#x27;methodOffence&#x27;: &#x27;GRAB AND DASH&#x27;, &#x27;ProfileId&#x27;: &#x27;651e6e50d10453bbc689ec40&#x27;, &#x27;ClearGeo&#x27;: True, &#x27;geo&#x27;: &#x27;73.84841725892831,18.511004603403823&#x27;}
+response_json {&#x27;data&#x27;: {&#x27;id&#x27;: &#x27;651ed4467751dc6faf30226c&#x27;, &#x27;message&#x27;: &quot;Note id &#x27;651ed4467751dc6faf30226c&#x27; successfully added&quot;}, &#x27;isSuccess&#x27;: True}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notes_api.py:9 test_notes_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notes_Module_API/test_notes_api.py::Test_notes_api::test_notes_Test_02</td>
+          <td class="col-duration">15.92</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;gender&#x27;: &#x27;MALE&#x27;, &#x27;build&#x27;: &#x27;build&#x27;, &#x27;bodyMarkings&#x27;: &#x27;mole&#x27;, &#x27;narrativeDesc&#x27;: &#x27;nsarra&#x27;, &#x27;action&#x27;: &#x27;Call Police&#x27;, &#x27;storeId&#x27;: &#x27;Pune&#x27;, &#x27;caseNumber&#x27;: &#x27;theft one bottle&#x27;, &#x27;timeIncident&#x27;: &#x27;09/21/2023 07:47&#x27;, &#x27;reportedBy&#x27;: &#x27;staff&#x27;, &#x27;reportedLoss&#x27;: 8000, &#x27;caseEventType&#x27;: &#x27;STORE THREAT&#x27;, &#x27;activityType&#x27;: &#x27;DOMESTIC VIOLENCE&#x27;, &#x27;heightType&#x27;: &#x27;5.6-5.9&#x27;, &#x27;methodOffence&#x27;: &#x27;GRAB AND DASH&#x27;, &#x27;ProfileId&#x27;: &#x27;651e6e50d10453bbc689ec40&#x27;, &#x27;ClearGeo&#x27;: True, &#x27;geo&#x27;: &#x27;73.84841725892831,18.511004603403823&#x27;}
+response_json {&#x27;data&#x27;: {&#x27;id&#x27;: &#x27;651ed4537751dc6faf302287&#x27;, &#x27;message&#x27;: &quot;Note id &#x27;651ed4537751dc6faf302287&#x27; successfully added&quot;}, &#x27;isSuccess&#x27;: True}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notes_api.py:16 test_notes_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notes_Module_API/test_notes_api.py::Test_notes_api::test_notes_Test_03</td>
+          <td class="col-duration">24.65</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;gender&#x27;: &#x27;MALE&#x27;, &#x27;build&#x27;: &#x27;build&#x27;, &#x27;bodyMarkings&#x27;: &#x27;mole&#x27;, &#x27;narrativeDesc&#x27;: &#x27;nsarra&#x27;, &#x27;action&#x27;: &#x27;Call Police&#x27;, &#x27;storeId&#x27;: &#x27;Pune&#x27;, &#x27;caseNumber&#x27;: &#x27;theft one bottle&#x27;, &#x27;timeIncident&#x27;: &#x27;09/21/2023 07:47&#x27;, &#x27;reportedBy&#x27;: &#x27;staff&#x27;, &#x27;reportedLoss&#x27;: 8000, &#x27;caseEventType&#x27;: &#x27;STORE THREAT&#x27;, &#x27;activityType&#x27;: &#x27;DOMESTIC VIOLENCE&#x27;, &#x27;heightType&#x27;: &#x27;5.6-5.9&#x27;, &#x27;methodOffence&#x27;: &#x27;GRAB AND DASH&#x27;, &#x27;ProfileId&#x27;: &#x27;651e6e50d10453bbc689ec40&#x27;, &#x27;ClearGeo&#x27;: True, &#x27;geo&#x27;: &#x27;73.84841725892831,18.511004603403823&#x27;}
+response_json {&#x27;data&#x27;: {&#x27;id&#x27;: &#x27;651ed4697751dc6faf3022ac&#x27;, &#x27;message&#x27;: &quot;Note id &#x27;651ed4697751dc6faf3022ac&#x27; successfully added&quot;}, &#x27;isSuccess&#x27;: True}
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Notes
+{&quot;gender&quot;: &quot;MALE&quot;, &quot;build&quot;: &quot;build&quot;, &quot;bodyMarkings&quot;: &quot;mole&quot;, &quot;narrativeDesc&quot;: &quot;nsarra&quot;, &quot;action&quot;: &quot;Call Police&quot;, &quot;storeId&quot;: &quot;Pune&quot;, &quot;caseNumber&quot;: &quot;theft one bottle&quot;, &quot;timeIncident&quot;: &quot;09/21/2023 07:47&quot;, &quot;reportedBy&quot;: &quot;staff&quot;, &quot;reportedLoss&quot;: &quot;7000&quot;, &quot;caseEventType&quot;: &quot;STORE THREAT&quot;, &quot;activityType&quot;: &quot;DOMESTIC VIOLENCE&quot;, &quot;heightType&quot;: &quot;5.6-5.9&quot;, &quot;methodOffence&quot;: &quot;GRAB AND DASH&quot;, &quot;NoteId&quot;: &quot;651ed4697751dc6faf3022ac&quot;, &quot;SetCases&quot;: true}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notes_api.py:23 test_notes_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notes_Module_API/test_notes_api.py::Test_notes_api::test_notes_Test_04</td>
+          <td class="col-duration">14.15</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;gender&#x27;: &#x27;MALE&#x27;, &#x27;build&#x27;: &#x27;build&#x27;, &#x27;bodyMarkings&#x27;: &#x27;mole&#x27;, &#x27;narrativeDesc&#x27;: &#x27;nsarra&#x27;, &#x27;action&#x27;: &#x27;Call Police&#x27;, &#x27;storeId&#x27;: &#x27;Pune&#x27;, &#x27;caseNumber&#x27;: &#x27;theft one bottle&#x27;, &#x27;timeIncident&#x27;: &#x27;09/21/2023 07:47&#x27;, &#x27;reportedBy&#x27;: &#x27;staff&#x27;, &#x27;reportedLoss&#x27;: 8000, &#x27;caseEventType&#x27;: &#x27;STORE THREAT&#x27;, &#x27;activityType&#x27;: &#x27;DOMESTIC VIOLENCE&#x27;, &#x27;heightType&#x27;: &#x27;5.6-5.9&#x27;, &#x27;methodOffence&#x27;: &#x27;GRAB AND DASH&#x27;, &#x27;ProfileId&#x27;: &#x27;651e6e50d10453bbc689ec40&#x27;, &#x27;ClearGeo&#x27;: True, &#x27;geo&#x27;: &#x27;73.84841725892831,18.511004603403823&#x27;}
+response_json {&#x27;data&#x27;: {&#x27;id&#x27;: &#x27;651ed4797751dc6faf3022d7&#x27;, &#x27;message&#x27;: &quot;Note id &#x27;651ed4797751dc6faf3022d7&#x27; successfully added&quot;}, &#x27;isSuccess&#x27;: True}
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notes_api.py:30 test_notes_Test_04  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notes_Module_API/test_notes_api.py::Test_notes_api::test_notes_Test_05</td>
+          <td class="col-duration">14.19</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;gender&#x27;: &#x27;MALE&#x27;, &#x27;build&#x27;: &#x27;build&#x27;, &#x27;bodyMarkings&#x27;: &#x27;mole&#x27;, &#x27;narrativeDesc&#x27;: &#x27;nsarra&#x27;, &#x27;action&#x27;: &#x27;Call Police&#x27;, &#x27;storeId&#x27;: &#x27;Pune&#x27;, &#x27;caseNumber&#x27;: &#x27;theft one bottle&#x27;, &#x27;timeIncident&#x27;: &#x27;09/21/2023 07:47&#x27;, &#x27;reportedBy&#x27;: &#x27;staff&#x27;, &#x27;reportedLoss&#x27;: 8000, &#x27;caseEventType&#x27;: &#x27;STORE THREAT&#x27;, &#x27;activityType&#x27;: &#x27;DOMESTIC VIOLENCE&#x27;, &#x27;heightType&#x27;: &#x27;5.6-5.9&#x27;, &#x27;methodOffence&#x27;: &#x27;GRAB AND DASH&#x27;, &#x27;ProfileId&#x27;: &#x27;651e6e50d10453bbc689ec40&#x27;, &#x27;ClearGeo&#x27;: True, &#x27;geo&#x27;: &#x27;73.84841725892831,18.511004603403823&#x27;}
+response_json {&#x27;data&#x27;: {&#x27;id&#x27;: &#x27;651ed4877751dc6faf30230c&#x27;, &#x27;message&#x27;: &quot;Note id &#x27;651ed4877751dc6faf30230c&#x27; successfully added&quot;}, &#x27;isSuccess&#x27;: True}
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Notes/clear
+{&quot;fields&quot;: [&quot;build&quot;], &quot;NoteId&quot;: &quot;651ed4877751dc6faf30230c&quot;}
+response_list ({&#x27;fields&#x27;: [&#x27;build&#x27;], &#x27;NoteId&#x27;: &#x27;651ed4877751dc6faf30230c&#x27;}, &lt;Response [200]&gt;, {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;Note information has been updated&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notes_api.py:37 test_notes_Test_05  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notes_Module_API/test_notes_api.py::Test_notes_api::test_notes_Test_06</td>
+          <td class="col-duration">14.82</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;gender&#x27;: &#x27;MALE&#x27;, &#x27;build&#x27;: &#x27;build&#x27;, &#x27;bodyMarkings&#x27;: &#x27;mole&#x27;, &#x27;narrativeDesc&#x27;: &#x27;nsarra&#x27;, &#x27;action&#x27;: &#x27;Call Police&#x27;, &#x27;storeId&#x27;: &#x27;Pune&#x27;, &#x27;caseNumber&#x27;: &#x27;theft one bottle&#x27;, &#x27;timeIncident&#x27;: &#x27;09/21/2023 07:47&#x27;, &#x27;reportedBy&#x27;: &#x27;staff&#x27;, &#x27;reportedLoss&#x27;: 8000, &#x27;caseEventType&#x27;: &#x27;STORE THREAT&#x27;, &#x27;activityType&#x27;: &#x27;DOMESTIC VIOLENCE&#x27;, &#x27;heightType&#x27;: &#x27;5.6-5.9&#x27;, &#x27;methodOffence&#x27;: &#x27;GRAB AND DASH&#x27;, &#x27;ProfileId&#x27;: &#x27;651e6e50d10453bbc689ec40&#x27;, &#x27;ClearGeo&#x27;: True, &#x27;geo&#x27;: &#x27;73.84841725892831,18.511004603403823&#x27;}
+response_json {&#x27;data&#x27;: {&#x27;id&#x27;: &#x27;651ed4957751dc6faf302334&#x27;, &#x27;message&#x27;: &quot;Note id &#x27;651ed4957751dc6faf302334&#x27; successfully added&quot;}, &#x27;isSuccess&#x27;: True}
+files [(&#x27;Images&#x27;, (&#x27;image.png&#x27;, &lt;_io.BufferedReader name=&#x27;D:\\Git Hub\\FF_Automation_Script_13_09_2023\\API_Test_Data\\img2.png&#x27;&gt;, &#x27;image/png&#x27;))]
+{&#x27;NoteId&#x27;: &#x27;651ed4957751dc6faf302334&#x27;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;1 images added to note id 651ed4957751dc6faf302334 (12c61e07e3903298a05e12b5d1ebf5b0).&#x27;}}
+response_list ({&#x27;NoteId&#x27;: &#x27;651ed4957751dc6faf302334&#x27;}, &lt;Response [200]&gt;, {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;1 images added to note id 651ed4957751dc6faf302334 (12c61e07e3903298a05e12b5d1ebf5b0).&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notes_api.py:44 test_notes_Test_06  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notes_Module_API/test_notes_api.py::Test_notes_api::test_notes_Test_07</td>
+          <td class="col-duration">16.58</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>{&#x27;gender&#x27;: &#x27;MALE&#x27;, &#x27;build&#x27;: &#x27;build&#x27;, &#x27;bodyMarkings&#x27;: &#x27;mole&#x27;, &#x27;narrativeDesc&#x27;: &#x27;nsarra&#x27;, &#x27;action&#x27;: &#x27;Call Police&#x27;, &#x27;storeId&#x27;: &#x27;Pune&#x27;, &#x27;caseNumber&#x27;: &#x27;theft one bottle&#x27;, &#x27;timeIncident&#x27;: &#x27;09/21/2023 07:47&#x27;, &#x27;reportedBy&#x27;: &#x27;staff&#x27;, &#x27;reportedLoss&#x27;: 8000, &#x27;caseEventType&#x27;: &#x27;STORE THREAT&#x27;, &#x27;activityType&#x27;: &#x27;DOMESTIC VIOLENCE&#x27;, &#x27;heightType&#x27;: &#x27;5.6-5.9&#x27;, &#x27;methodOffence&#x27;: &#x27;GRAB AND DASH&#x27;, &#x27;ProfileId&#x27;: &#x27;651e6e50d10453bbc689ec40&#x27;, &#x27;ClearGeo&#x27;: True, &#x27;geo&#x27;: &#x27;73.84841725892831,18.511004603403823&#x27;}
+response_json {&#x27;data&#x27;: {&#x27;id&#x27;: &#x27;651ed4a77751dc6faf302360&#x27;, &#x27;message&#x27;: &quot;Note id &#x27;651ed4a77751dc6faf302360&#x27; successfully added&quot;}, &#x27;isSuccess&#x27;: True}
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Notes/651ed4a77751dc6faf302360/image
+&lt;Response [200]&gt;
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notes_api.py:51 test_notes_Test_07  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_01</td>
+          <td class="col-duration">16.51</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Zones/GetZones
+({&#x27;name&#x27;: &#x27;Test_notification_Api464&#x27;, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;userIds&#x27;: [&#x27;651e9cf27751dc6faf2fffaa&#x27;], &#x27;caseGroupIdsUserIds&#x27;: [&#x27;651ed4b67751dc6faf30237b&#x27;], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed4ba7751dc6faf302386&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed4ba7751dc6faf302386 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api464&#x27;)
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:11 test_Notification_Groups_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_02</td>
+          <td class="col-duration">13.01</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api961&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed4c77751dc6faf302396&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed4c77751dc6faf302396 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api961&#x27;)
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:19 test_Notification_Groups_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_03</td>
+          <td class="col-duration">13.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, {&#x27;agroupinfo&#x27;: {&#x27;agroups&#x27;: [{&#x27;agroupID&#x27;: &#x27;651e6e5e4329bcab67b01b6e&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;651e6e5e4329bcab67b01b67&#x27;, &#x27;name&#x27;: &#x27;DefaultEnrollmentGroup&#x27;}, {&#x27;cgroupID&#x27;: &#x27;651e9d667751dc6faf3000a9&#x27;, &#x27;name&#x27;: &#x27;GroupName&#x27;}, {&#x27;cgroupID&#x27;: &#x27;651e9fb67751dc6faf300790&#x27;, &#x27;name&#x27;: &#x27;GroupName&#x27;}, {&#x27;cgroupID&#x27;: &#x27;651ec75f7751dc6faf30131d&#x27;, &#x27;name&#x27;: &#x27;GroupName&#x27;}, {&#x27;cgroupID&#x27;: &#x27;651ed2d57751dc6faf301f55&#x27;, &#x27;name&#x27;: &#x27;GroupName&#x27;}], &#x27;desc&#x27;: &#x27;Default Alert Group&#x27;, &#x27;name&#x27;: &#x27;DefaultAlertGroup&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [{&#x27;userId&#x27;: &#x27;651e6e5e4329bcab67b01b77&#x27;, &#x27;userName&#x27;: &#x27;core&#x27;, &#x27;contact&#x27;: {&#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;email&#x27;: &#x27;ritesh.kagale@facefirst.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;, &#x27;651e8b121b0bb5918035486f&#x27;, &#x27;651e8b8d1b0bb59180354883&#x27;, &#x27;651e8d191b0bb59180354897&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e447751dc6faf300368&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;651e9e427751dc6faf30035d&#x27;, &#x27;name&#x27;: &#x27;test enrollment346&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api250&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [{&#x27;userId&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;userName&#x27;: &#x27;shubham&#x27;, &#x27;contact&#x27;: {&#x27;lastName&#x27;: &#x27;c&#x27;, &#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;firstName&#x27;: &#x27;shubham&#x27;, &#x27;email&#x27;: &#x27;admin@gmail.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e4a7751dc6faf300378&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api975&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e537751dc6faf300396&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api566&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e5a7751dc6faf3003b1&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;New Description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api619&#x27;, &#x27;ownerID&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e667751dc6faf3003d8&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api252&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [{&#x27;userId&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;userName&#x27;: &#x27;shubham&#x27;, &#x27;contact&#x27;: {&#x27;lastName&#x27;: &#x27;c&#x27;, &#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;firstName&#x27;: &#x27;shubham&#x27;, &#x27;email&#x27;: &#x27;admin@gmail.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e757751dc6faf3003ff&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api401&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e907751dc6faf300455&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api144&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651e9e9e7751dc6faf30047b&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;651e9e997751dc6faf30046a&#x27;, &#x27;name&#x27;: &#x27;test enrollment216&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api746&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec9357751dc6faf3017cf&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;651ec9327751dc6faf3017c4&#x27;, &#x27;name&#x27;: &#x27;test enrollment405&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api259&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [{&#x27;userId&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;userName&#x27;: &#x27;shubham&#x27;, &#x27;contact&#x27;: {&#x27;lastName&#x27;: &#x27;c&#x27;, &#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;firstName&#x27;: &#x27;shubham&#x27;, &#x27;email&#x27;: &#x27;admin@gmail.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec9407751dc6faf3017e3&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api118&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec9507751dc6faf301815&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api320&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec95f7751dc6faf301830&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;New Description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api258&#x27;, &#x27;ownerID&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec9757751dc6faf301893&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api353&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [{&#x27;userId&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;userName&#x27;: &#x27;shubham&#x27;, &#x27;contact&#x27;: {&#x27;lastName&#x27;: &#x27;c&#x27;, &#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;firstName&#x27;: &#x27;shubham&#x27;, &#x27;email&#x27;: &#x27;admin@gmail.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec98c7751dc6faf3018bc&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api173&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec9b97751dc6faf301912&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api164&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ec9db7751dc6faf30193a&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;651ec9d27751dc6faf301929&#x27;, &#x27;name&#x27;: &#x27;test enrollment991&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api836&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ed4ba7751dc6faf302386&#x27;, &#x27;caseGroups&#x27;: [{&#x27;cgroupID&#x27;: &#x27;651ed4b67751dc6faf30237b&#x27;, &#x27;name&#x27;: &#x27;test enrollment282&#x27;}], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api464&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [{&#x27;userId&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;userName&#x27;: &#x27;shubham&#x27;, &#x27;contact&#x27;: {&#x27;lastName&#x27;: &#x27;c&#x27;, &#x27;timezoneID&#x27;: &#x27;Asia/Kolkata&#x27;, &#x27;firstName&#x27;: &#x27;shubham&#x27;, &#x27;email&#x27;: &#x27;admin@gmail.com&#x27;}}], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}, {&#x27;agroupID&#x27;: &#x27;651ed4c77751dc6faf302396&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api961&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:27 test_Notification_Groups_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_04</td>
+          <td class="col-duration">13.28</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+(&lt;Response [200]&gt;, {&#x27;agroupinfo&#x27;: {&#x27;agroups&#x27;: [{&#x27;agroupID&#x27;: &#x27;651ed4de7751dc6faf3023d4&#x27;, &#x27;caseGroups&#x27;: [], &#x27;desc&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api370&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;users&#x27;: [], &#x27;zoneIds&#x27;: [&#x27;651e6e4ed10453bbc689ec09&#x27;]}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:35 test_Notification_Groups_Test_04  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_05</td>
+          <td class="col-duration">17.27</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api743&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed4ec7751dc6faf3023ef&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed4ec7751dc6faf3023ef was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api743&#x27;)
+651ed4ec7751dc6faf3023ef
+Test_notification_Api743
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups?Id=651ed4ec7751dc6faf3023ef
+response_list ({&#x27;agroupID&#x27;: &#x27;651ed4ec7751dc6faf3023ef&#x27;, &#x27;description&#x27;: &#x27;New Description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api743&#x27;, &#x27;ownerID&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed4ec7751dc6faf3023ef&#x27;, &#x27;message&#x27;: &#x27;Alert group 651ed4ec7751dc6faf3023ef is updated.&#x27;, &#x27;isSuccess&#x27;: True})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:43 test_Notification_Groups_Test_05  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_06</td>
+          <td class="col-duration">20.66</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api152&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed5017751dc6faf302416&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed5017751dc6faf302416 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api152&#x27;)
+651ed5017751dc6faf302416
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups/addUserToAlertGroup
+request_data {&quot;agroupID&quot;: &quot;651ed5017751dc6faf302416&quot;, &quot;userId&quot;: &quot;651e9cf27751dc6faf2fffaa&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;651e9cf27751dc6faf2fffaa user have been added to the alert group with id 651ed5017751dc6faf302416&#x27;}}
+response_list ({&#x27;agroupID&#x27;: &#x27;651ed5017751dc6faf302416&#x27;, &#x27;userId&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;}, &lt;Response [200]&gt;, {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;651e9cf27751dc6faf2fffaa user have been added to the alert group with id 651ed5017751dc6faf302416&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:51 test_Notification_Groups_Test_06  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_07</td>
+          <td class="col-duration">27.18</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api70&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed5147751dc6faf30243d&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed5147751dc6faf30243d was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api70&#x27;)
+651ed5147751dc6faf30243d
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups/addUserToAlertGroup
+request_data {&quot;agroupID&quot;: &quot;651ed5147751dc6faf30243d&quot;, &quot;userId&quot;: &quot;651e9cf27751dc6faf2fffaa&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;651e9cf27751dc6faf2fffaa user have been added to the alert group with id 651ed5147751dc6faf30243d&#x27;}}
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/AlertGroups/removeUserFromAlertGroup
+request_data {&quot;agroupID&quot;: &quot;651ed5147751dc6faf30243d&quot;, &quot;userId&quot;: &quot;651e9cf27751dc6faf2fffaa&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;651e9cf27751dc6faf2fffaa user have been removed from alert group with id 651ed5147751dc6faf30243d&#x27;}}
+response_list ({&#x27;agroupID&#x27;: &#x27;651ed5147751dc6faf30243d&#x27;, &#x27;userId&#x27;: &#x27;651e9cf27751dc6faf2fffaa&#x27;}, &lt;Response [200]&gt;, {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;651e9cf27751dc6faf2fffaa user have been removed from alert group with id 651ed5147751dc6faf30243d&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:59 test_Notification_Groups_Test_07  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_08</td>
+          <td class="col-duration">16.05</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api552&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed52d7751dc6faf30246f&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed52d7751dc6faf30246f was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api552&#x27;)
+651ed52d7751dc6faf30246f
+response_list (&lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed52d7751dc6faf30246f&#x27;, &#x27;message&#x27;: &quot;The alert group &#x27;Test_notification_Api552&#x27; has been deleted (group ID was 651ed52d7751dc6faf30246f)&quot;, &#x27;isSuccess&#x27;: True})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:67 test_Notification_Groups_Test_08  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_09</td>
+          <td class="col-duration">19.89</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api818&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed53e7751dc6faf302493&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed53e7751dc6faf302493 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api818&#x27;)
+651ed53e7751dc6faf302493
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+response_list ({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api818&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [500]&gt;, {&#x27;ExceptionType&#x27;: &#x27;FluentValidation.ValidationException&#x27;, &#x27;Message&#x27;: &#x27;An unhandled exception has occured while executing the request.&#x27;, &#x27;Data&#x27;: {&#x27;exceptionMessage&#x27;: &#x27;Validation failed: \r\n -- Name: Name already exists. Severity: Error&#x27;, &#x27;innerException&#x27;: None, &#x27;requestId&#x27;: &#x27;00-829d09125848f3da4e1f37393f491be2-ad2d132b843280ba-00&#x27;, &#x27;requestPath&#x27;: &#x27;/api/AlertGroups&#x27;, &#x27;connectionId&#x27;: &#x27;0HMU5HMGR4OC1&#x27;}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:75 test_Notification_Groups_Test_09  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Notification_Groups_Module_APi/test_notification_groups_api.py::Test_Notification_groups_api::test_Notification_Groups_Test_10</td>
+          <td class="col-duration">16.85</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>https://ff-india-qa10.eastus2.cloudapp.azure.com/api/Users/userInfo
+https://ff-india-qa10.eastus2.cloudapp.azure.com/api/EnrollmentGroups/addAlertGroupCase
+request_data {&quot;CGroupID&quot;: &quot;651ed54d7751dc6faf3024a8&quot;, &quot;AGroupID&quot;: &quot;651ed5557751dc6faf3024b9&quot;}
+response_json {&#x27;result&#x27;: {&#x27;status&#x27;: &#x27;ok&#x27;, &#x27;message&#x27;: &#x27;1 enrollment groups have been added to the alert group with id = 651ed54d7751dc6faf3024a8&#x27;}}
+({&#x27;agroupID&#x27;: True, &#x27;description&#x27;: &#x27;test description&#x27;, &#x27;name&#x27;: &#x27;Test_notification_Api696&#x27;, &#x27;ownerID&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;set_cgroups&#x27;: 0}, &lt;Response [200]&gt;, {&#x27;data&#x27;: &#x27;651ed5557751dc6faf3024b9&#x27;, &#x27;message&#x27;: &#x27;AlertGroup 651ed5557751dc6faf3024b9 was created.&#x27;, &#x27;isSuccess&#x27;: True}, &#x27;Test_notification_Api696&#x27;)
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_notification_groups_api.py:83 test_Notification_Groups_Test_10  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_01</td>
+          <td class="col-duration">13.13</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:9 test_Users_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_02</td>
+          <td class="col-duration">13.35</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:16 test_Users_Test_02  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_03</td>
+          <td class="col-duration">16.31</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:23 test_Users_Test_03  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_04</td>
+          <td class="col-duration">13.93</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:30 test_Users_Test_04  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_06</td>
+          <td class="col-duration">12.32</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:37 test_Users_Test_06  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_07</td>
+          <td class="col-duration">22.15</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:44 test_Users_Test_07  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_08</td>
+          <td class="col-duration">25.26</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:51 test_Users_Test_08  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_10</td>
+          <td class="col-duration">30.63</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:65 test_Users_Test_10  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_11</td>
+          <td class="col-duration">6.03</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:72 test_Users_Test_11  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_12</td>
+          <td class="col-duration">11.43</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:79 test_Users_Test_12  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_13</td>
+          <td class="col-duration">9.19</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:86 test_Users_Test_13  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_14</td>
+          <td class="col-duration">7.76</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:93 test_Users_Test_14  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_15</td>
+          <td class="col-duration">6.35</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:100 test_Users_Test_15  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_16</td>
+          <td class="col-duration">6.66</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:107 test_Users_Test_16  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_17</td>
+          <td class="col-duration">8.20</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:114 test_Users_Test_17  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_18</td>
+          <td class="col-duration">16.44</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:121 test_Users_Test_18  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Users_Module_API/test_users_api.py::Test_Users_api::test_Users_Test_19</td>
+          <td class="col-duration">16.34</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_users_api.py:128 test_Users_Test_19  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Zones_Module_API/test_zones_api.py::Test_Zones_api::test_Zones_Test_01</td>
+          <td class="col-duration">7.33</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, {&#x27;zoneInfo&#x27;: {&#x27;zones&#x27;: [{&#x27;description&#x27;: &#x27;All Devices&#x27;, &#x27;isDefault&#x27;: True, &#x27;zoneId&#x27;: &#x27;651e6e4ed10453bbc689ec09&#x27;}, {&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;description&#x27;: &#x27;ff-india-qa10&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;651e6ed2694c7c51a9b4a7f7&#x27;, &#x27;regionId&#x27;: &#x27;651e6e4ed10453bbc689ec07&#x27;, &#x27;hostName&#x27;: &#x27;ff-india-qa10&#x27;}, {&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;description&#x27;: &#x27;DESKTOP-660P8Q2&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;651e8b121b0bb5918035486f&#x27;, &#x27;regionId&#x27;: &#x27;651e796b1b0bb591803547ea&#x27;, &#x27;hostName&#x27;: &#x27;DESKTOP-660P8Q2&#x27;}, {&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;description&#x27;: &#x27;DESKTOP-75UBP18&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;651e8b8d1b0bb59180354883&#x27;, &#x27;regionId&#x27;: &#x27;651e7a9f1b0bb591803547eb&#x27;, &#x27;hostName&#x27;: &#x27;DESKTOP-75UBP18&#x27;}, {&#x27;accountId&#x27;: &#x27;651e6e4dd10453bbc689ec05&#x27;, &#x27;description&#x27;: &#x27;DESKTOP-PTTAM1V&#x27;, &#x27;isDefault&#x27;: False, &#x27;zoneId&#x27;: &#x27;651e8d191b0bb59180354897&#x27;, &#x27;regionId&#x27;: &#x27;651e7b8c1b0bb591803547ec&#x27;, &#x27;hostName&#x27;: &#x27;DESKTOP-PTTAM1V&#x27;}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_zones_api.py:9 test_Zones_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">All_API_Test_Cases_Package/Zones_Module_API/test_zones_api.py::Test_Zones_api::test_Zones_Test_02</td>
+          <td class="col-duration">10.20</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log"> ------------------------------Captured stdout call------------------------------ <br/>(&lt;Response [200]&gt;, {&#x27;zoneInfo&#x27;: {&#x27;zones&#x27;: [{&#x27;description&#x27;: &#x27;All Devices&#x27;, &#x27;isDefault&#x27;: True, &#x27;zoneId&#x27;: &#x27;651e6e4ed10453bbc689ec09&#x27;}]}})
+<br/> -------------------------------Captured log call-------------------------------- <br/>INFO     root:test_zones_api.py:16 test_Zones_Test_01  : Execution Started &gt;&gt;<br/></div></td></tr></tbody></table></body></html>

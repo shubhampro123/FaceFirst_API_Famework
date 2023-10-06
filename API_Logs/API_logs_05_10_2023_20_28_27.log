@@ -1,0 +1,3 @@
+05/10/2023 08:28:27 PM : root         : INFO     : test_identify_enroll_Test_05  : Execution Started >>
+05/10/2023 08:28:52 PM : root         : INFO     : actual_status_code = 500, expected_status_code = 200
+05/10/2023 08:28:52 PM : root         : INFO     : actual_message = None, expected_message = None
