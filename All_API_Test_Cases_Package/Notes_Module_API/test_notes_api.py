@@ -53,10 +53,31 @@ class Test_notes_api(API_Base_Utilities):
             assert True
         else:
             assert False
-    #
-    # def test_notes_Test_08(self):
-    #     self.logger.info("test_notes_Test_08  : Execution Started >>")
-    #     if Notes_API_Methods(self.logger).verify_delete_image_using_note_id():
-    #         assert True
-    #     else:
-    #         assert False
+
+    def test_notes_Test_08(self):
+        self.logger.info("test_notes_Test_08  : Execution Started >>")
+        if Notes_API_Methods(self.logger).verify_delete_image_using_note_id():
+            assert True
+        else:
+            assert False
+
+    def test_notes_Test_09(self):
+        self.logger.info("test_notes_Test_09  : Execution Started >>")
+        if Notes_API_Methods(self.logger).verify_notes_search():
+            assert True
+        else:
+            assert False
+
+    def test_notes_Test_10(self):
+        self.logger.info("test_notes_Test_10  : Execution Started >>")
+        if Notes_API_Methods(self.logger).verify_notes_aggregates_by_geospatial():
+            assert True
+        else:
+            assert False
+
+    def test_notes_Test_11(self):
+        self.logger.info("test_notes_Test_11  : Execution Started >>")
+        if Notes_API_Methods(self.logger).verify_get_by_enrollment():
+            assert True
+        else:
+            assert False
