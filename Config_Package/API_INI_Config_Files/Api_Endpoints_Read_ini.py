@@ -481,6 +481,13 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def add_enrollment_with_image_end_point(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'add_enrollment_with_image_end_point')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def identify_enroll_test_data_sheet_name(self):
         try:
             ele = self.config.get('TEST_DATA_SHEET_NAME', 'identify_enroll_test_data_sheet_name')
@@ -572,6 +579,20 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def get_enrollment_end_point(self, case_id):
+        try:
+            ele = self.config.get('ENROLLMENT', 'get_enrollment_end_point')
+            return ele.format(case_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_data_by_id(self, case_id):
+        try:
+            ele = self.config.get('ENROLLMENT', 'get_enrollment_data_by_id')
+            return ele.format(case_id)
+        except Exception as ex:
+            print(ex)
+
     def delete_notes_endpoint(self, note_id):
         try:
             ele = self.config.get('NOTES', 'delete_notes_endpoint')
@@ -582,6 +603,13 @@ class Read_API_Endpoints:
     def clear_notes_endpoint(self):
         try:
             ele = self.config.get('NOTES', 'clear_notes_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def remove_enrollment_by_id(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'remove_enrollment_by_id')
             return ele
         except Exception as ex:
             print(ex)

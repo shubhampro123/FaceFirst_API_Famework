@@ -71,3 +71,27 @@ class Test_identify_enroll_api(API_Base_Utilities):
             assert True
         else:
             assert False
+
+    @pytest.mark.p1
+    def test_identify_enroll_Test_09(self):
+        self.logger.info("test_identify_enroll_Test_09  : Execution Started >>")
+        if Identify_Enroll_API_Methods(self.logger).verify_add_enrollment_with_image():
+            assert True
+        else:
+            assert False
+
+    @pytest.mark.p1
+    def test_identify_enroll_Test_10(self):
+        self.logger.info("test_identify_enroll_Test_10  : Execution Started >>")
+        if Identify_Enroll_API_Methods(self.logger).Verify_Get_enrollment_image_by_id():
+            assert True
+        else:
+            assert False
+
+    @pytest.mark.p1
+    def test_identify_enroll_Test_11(self):
+        self.logger.info("test_identify_enroll_Test_10  : Execution Started >>")
+        if Identify_Enroll_API_Methods(self.logger).Verify_remove_enrollment_image_by_id():
+            assert True
+        else:
+            assert False
