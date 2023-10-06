@@ -606,3 +606,24 @@ class Read_API_Endpoints:
             return ele.format(note_id)
         except Exception as ex:
             print(ex)
+
+    def note_search_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'note_search_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def aggregates_by_geospatial_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'aggregates_by_geospatial_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_by_enrollment_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'get_by_enrollment_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
