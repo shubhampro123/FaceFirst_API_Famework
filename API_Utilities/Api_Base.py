@@ -27,6 +27,8 @@ class API_Base_Utilities:
     detect_face_test_data_sheet_name = Read_API_Endpoints().detect_face_test_data_sheet_name()
     tags_test_data_sheet_name = Read_API_Endpoints().tags_test_data_sheet_name()
     user_role_test_data_sheet_name = Read_API_Endpoints().detect_face_test_data_sheet_name()
+    region_test_data_sheet_name = Read_API_Endpoints().region_data_sheet_name()
+    visitor_search_test_data_sheet_name = Read_API_Endpoints().visitor_search_test_data_sheet_name()
     logger = None
 
     @classmethod
