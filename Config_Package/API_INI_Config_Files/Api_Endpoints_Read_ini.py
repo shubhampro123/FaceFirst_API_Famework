@@ -166,6 +166,27 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def get_all_user_role_endpoint(self):
+        try:
+            ele = self.config.get('USER_ROLE', 'get_all_user_role_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def del_user_role_by_id_endpoint(self, value):
+        try:
+            ele = self.config.get('USER_ROLE', 'del_user_role_by_id_endpoint')
+            return ele.format(value)
+        except Exception as ex:
+            print(ex)
+
+    def update_user_role_endpoint(self):
+        try:
+            ele = self.config.get('USER_ROLE', 'update_user_role_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def get_all_enrollment_group_endpoint(self):
         try:
             ele = self.config.get('ENROLLMENT_GROUP', 'get_all_enrollment_group_endpoint')
@@ -634,6 +655,133 @@ class Read_API_Endpoints:
             return ele.format(note_id)
         except Exception as ex:
             print(ex)
+
+    def detect_face_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'detect_face_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def detect_face_endpoint(self):
+        try:
+            ele = self.config.get('DETECT_FACE', 'detect_face_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def detect_face_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'detect_face_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_test_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'tags_test_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'tags_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'tags_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def tags_endpoint(self):
+        try:
+            ele = self.config.get('TAGS', 'tags_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def create_tags_endpoint(self, name, serious_event, types):
+        try:
+            ele = self.config.get('TAGS', 'create_tags_endpoint')
+            return ele.format(name, serious_event, types)
+        except Exception as ex:
+            print(ex)
+
+    def get_tags_endpoint(self):
+        try:
+            ele = self.config.get('TAGS', 'get_tags_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def del_tags_by_id_endpoint(self, value):
+        try:
+            ele = self.config.get('TAGS', 'del_tags_by_id_endpoint')
+            return ele.format(value)
+        except Exception as ex:
+            print(ex)
+
+    def update_tags_endpoint(self):
+        try:
+            ele = self.config.get('TAGS', 'update_tags_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def region_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'region_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def region_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'region_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_region_id_endpoint(self):
+        try:
+            ele = self.config.get('REGION', 'get_region_id_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def start_search_endpoint(self):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'start_search_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def fed_search_status_endpoint(self):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'fed_search_status_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def visitor_search_test_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'visitor_search_test_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def visitor_search_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'visitor_search_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
 
     def note_search_endpoint(self):
         try:
