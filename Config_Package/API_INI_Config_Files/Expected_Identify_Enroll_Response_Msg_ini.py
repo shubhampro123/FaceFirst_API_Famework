@@ -18,3 +18,17 @@ class Read_identify_enroll_Response_msg:
             return ele
         except Exception as ex:
             print(ex)
+
+    def edit_enrollment_success_msg(self, value):
+        try:
+            ele = self.config.get('MESSAGE', 'edit_enrollment_success_msg')
+            return ele.format(value)
+        except Exception as ex:
+            print(ex)
+
+    def delete_enrollment_success_msg(self, value):
+        try:
+            ele = self.config.get('MESSAGE', 'delete_enrollment_success_msg')
+            return ele.format(value)
+        except Exception as ex:
+            print(ex)

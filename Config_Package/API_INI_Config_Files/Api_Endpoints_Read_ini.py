@@ -369,14 +369,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_alert_group_using_ID(self, a_group_id):
+    def get_alert_group_using_ID(self,a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'get_alert_group_using_ID')
             return ele.format(a_group_id)
         except Exception as ex:
             print(ex)
 
-    def put_alert_group_ID(self, a_group_id):
+    def put_alert_group_ID(self,a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'put_alert_group_ID')
             return ele.format(a_group_id)
@@ -418,7 +418,7 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def delete_alert_group(self, a_group_id):
+    def delete_alert_group(self,a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'delete_alert_group')
             return ele.format(a_group_id)
@@ -432,7 +432,7 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_zone_by_id_endpoint(self, zone_id):
+    def get_zone_by_id_endpoint(self,zone_id):
         try:
             ele = self.config.get('ZONES', 'get_zone_by_id_endpoint')
             return ele.format(zone_id)
@@ -460,14 +460,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_account_by_account_id_endpoint(self, account_id):
+    def get_account_by_account_id_endpoint(self,account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_by_account_id_endpoint')
             return ele.format(account_id)
         except Exception as ex:
             print(ex)
 
-    def get_account_stations_by_account_id_endpoint(self, account_id):
+    def get_account_stations_by_account_id_endpoint(self,account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_stations_by_account_id_endpoint')
             return ele.format(account_id)
@@ -498,6 +498,13 @@ class Read_API_Endpoints:
     def create_enrollment_endpoint(self):
         try:
             ele = self.config.get('IDENTIFY_ENROLL', 'create_enrollment_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def add_enrollment_with_image_end_point(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'add_enrollment_with_image_end_point')
             return ele
         except Exception as ex:
             print(ex)
@@ -593,6 +600,20 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def get_enrollment_end_point(self, case_id):
+        try:
+            ele = self.config.get('ENROLLMENT', 'get_enrollment_end_point')
+            return ele.format(case_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_data_by_id(self, case_id):
+        try:
+            ele = self.config.get('ENROLLMENT', 'get_enrollment_data_by_id')
+            return ele.format(case_id)
+        except Exception as ex:
+            print(ex)
+
     def delete_notes_endpoint(self, note_id):
         try:
             ele = self.config.get('NOTES', 'delete_notes_endpoint')
@@ -603,6 +624,13 @@ class Read_API_Endpoints:
     def clear_notes_endpoint(self):
         try:
             ele = self.config.get('NOTES', 'clear_notes_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def remove_enrollment_by_id(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'remove_enrollment_by_id')
             return ele
         except Exception as ex:
             print(ex)
@@ -750,6 +778,28 @@ class Read_API_Endpoints:
     def visitor_search_test_data_sheet_name(self):
         try:
             ele = self.config.get('TEST_DATA_SHEET_NAME', 'visitor_search_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+
+    def note_search_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'note_search_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def aggregates_by_geospatial_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'aggregates_by_geospatial_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_by_enrollment_endpoint(self):
+        try:
+            ele = self.config.get('NOTES', 'get_by_enrollment_endpoint')
             return ele
         except Exception as ex:
             print(ex)
