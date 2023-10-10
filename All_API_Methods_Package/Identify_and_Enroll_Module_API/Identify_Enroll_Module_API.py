@@ -356,14 +356,14 @@ class Identify_Enroll_API_Methods:
             self.response = response_list[1]
             self.json_response = response_list[2]
             if response_validation(self.response):
-                excel_result(self.row, "Test_10", self.r_body, self.json_response, self.response.status_code,
+                excel_result(self.row, "Test_11", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg, True, self.sheet_name)
                 time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(True)
             else:
                 self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
                 self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
-                excel_result(self.row, "Test_10", self.r_body, self.json_response, self.response.status_code,
+                excel_result(self.row, "Test_11", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg, False, self.sheet_name)
                 time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(False)
@@ -372,9 +372,73 @@ class Identify_Enroll_API_Methods:
             else:
                 return True
         except Exception as ex:
-            excel_result(self.row, "Test_10", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+            excel_result(self.row, "Test_11", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
-            self.log.info(f"test_enrollment_group_Test_10:  {ex}")
+            self.log.info(f"test_enrollment_group_Test_11:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def verify_create_enrollment_with_id_and_notification_group(self):
+        result = []
+        try:
+            self.row = 13
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = create_enrollment_with_id_and_notification_group_request()
+            self.r_body = response_list[0]
+            self.response = response_list[1]
+            self.json_response = response_list[2]
+            if response_validation(self.response):
+                excel_result(self.row, "Test_12", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_12", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_12", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_enrollment_group_Test_12:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def verify_query_enrollment_info(self):
+        result = []
+        try:
+            self.row = 14
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = query_enrollment_info_request()
+            self.r_body = response_list[0]
+            self.response = response_list[1]
+            self.json_response = response_list[2]
+            if response_validation(self.response):
+                excel_result(self.row, "Test_12", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_12", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_12", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_enrollment_group_Test_12:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
             return False
 
@@ -548,7 +612,7 @@ def identify_enrollment():
     create_enrollment_request()
     token = login_token()
     image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
-    headers = {"Token": token, "Content-Type": "multipart/form-data"}
+    headers = {"Token": token}
     data = identify_enrollment_data(6)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().identify_enrollment_endpoint()}"
     request_body = {"DetailLevel": data[0], "MaxMatches": data[1], "IncludeMatrics": data[2]}
@@ -589,6 +653,34 @@ def add_enrollment_image(case_id):
     ]
     headers = {"Token": token}
     response_str = requests.post(url, params=params, headers=headers, files=files)
+
+
+def create_enrollment_with_id_and_notification_group_request():
+    data = create_enrollment_request()
+    case_id = data[3]
+    token = login_token()
+    headers = {"Token": token, "Content-Type": "application/json"}
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enroll_with_id_ng(case_id)}"
+    request_body = {"regionId": select_region(), "enrollmentId": case_id, "source": "null",
+                    "enrollmentGroupIds": [get_C_group_Id()]}
+    request_data = json.dumps(request_body)
+    response_str = requests.post(url, request_data, headers=headers)
+    response_json = response_str.json()
+    return request_data, response_str, response_json
+
+
+def query_enrollment_info_request():
+    data = create_enrollment_request()
+    case_id = data[3]
+    token = login_token()
+    headers = {"Token": token, "Content-Type": "application/json"}
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().query_enrollment_info_by_id()}"
+    request_body = [case_id]
+    request_data = json.dumps(request_body)
+    response_str = requests.post(url, request_data, headers=headers)
+    response_json = response_str.json()
+    print(response_json)
+    return request_data, response_str, response_json
 
 
 def get_C_group_Id():

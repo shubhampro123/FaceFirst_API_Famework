@@ -19,6 +19,41 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def get_audit_approvers_endpoint(self):
+        try:
+            ele = self.config.get('Audit', 'get_audit_approves')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_audit_users_endpoint(self):
+        try:
+            ele = self.config.get('Audit', 'get_audit_users_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_audit_login_endpoint(self):
+        try:
+            ele = self.config.get('Audit', 'get_audit_login_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_request_audit_logins(self):
+        try:
+            ele = self.config.get('Audit', 'get_request_audit_logins')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_request_audit_threshold_changes(self):
+        try:
+            ele = self.config.get('Audit', 'get_request_audit_threshold_changes')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def users_endpoint(self):
         try:
             ele = self.config.get('USERS', 'users_endpoint')
@@ -26,9 +61,23 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def alr_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'alr_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def user_role_endpoint(self):
         try:
             ele = self.config.get('USER_ROLE', 'user_role_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def alr_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'alr_result_sheet_name')
             return ele
         except Exception as ex:
             print(ex)
@@ -348,14 +397,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_alert_group_using_ID(self,a_group_id):
+    def get_alert_group_using_ID(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'get_alert_group_using_ID')
             return ele.format(a_group_id)
         except Exception as ex:
             print(ex)
 
-    def put_alert_group_ID(self,a_group_id):
+    def put_alert_group_ID(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'put_alert_group_ID')
             return ele.format(a_group_id)
@@ -397,7 +446,7 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def delete_alert_group(self,a_group_id):
+    def delete_alert_group(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'delete_alert_group')
             return ele.format(a_group_id)
@@ -411,7 +460,7 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_zone_by_id_endpoint(self,zone_id):
+    def get_zone_by_id_endpoint(self, zone_id):
         try:
             ele = self.config.get('ZONES', 'get_zone_by_id_endpoint')
             return ele.format(zone_id)
@@ -439,14 +488,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_account_by_account_id_endpoint(self,account_id):
+    def get_account_by_account_id_endpoint(self, account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_by_account_id_endpoint')
             return ele.format(account_id)
         except Exception as ex:
             print(ex)
 
-    def get_account_stations_by_account_id_endpoint(self,account_id):
+    def get_account_stations_by_account_id_endpoint(self, account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_stations_by_account_id_endpoint')
             return ele.format(account_id)
@@ -621,6 +670,13 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def create_enroll_with_id_ng(self, case_id):
+        try:
+            ele = self.config.get('ENROLLMENT', 'create_enroll_with_id_ng')
+            return ele.format(case_id)
+        except Exception as ex:
+            print(ex)
+
     def get_images_endpoint(self, note_id):
         try:
             ele = self.config.get('NOTES', 'get_images_endpoint')
@@ -638,6 +694,13 @@ class Read_API_Endpoints:
     def note_search_endpoint(self):
         try:
             ele = self.config.get('NOTES', 'note_search_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def query_enrollment_info_by_id(self):
+        try:
+            ele = self.config.get('ENROLLMENT', 'query_enrollment_info_by_id')
             return ele
         except Exception as ex:
             print(ex)

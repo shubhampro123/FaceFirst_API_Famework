@@ -475,7 +475,7 @@ def create_enrollment_group_with_verify_addCaseGroupCase_request():
     cGroupId = data[3]
     zones_data = get_all_zones()
     account_id = zones_data[1]
-    request_body = {"id": [account_id], "case_id": get_case_id(), "cgroup_id": cGroupId}
+    request_body = {"id": [account_id], "case_id": get_case_id(token), "cgroup_id": cGroupId}
     request_data = json.dumps(request_body)
     response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()
@@ -506,7 +506,7 @@ def remove_enrollment_group_with_removeCaseGroupCase_request():
     cGroupId = data[3]
     zones_data = get_all_zones()
     account_id = zones_data[1]
-    request_body = {"id": [account_id], "case_id": get_case_id(), "cgroup_id": cGroupId}
+    request_body = {"id": [account_id], "case_id": get_case_id(token), "cgroup_id": cGroupId}
     request_data = json.dumps(request_body)
     response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()
@@ -613,13 +613,12 @@ def get_all_zones():
     return data, account_id
 
 
-def get_case_id():
-    token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+def get_case_id(token):
+    headers = {'Token': token, 'Content-Type': 'application/json'}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_endpoint()}"
     request_body = {"DetailLevel": 3, "Offset": 0, "count": 20, "Ascending": 0, "IsExact": False}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, headers=headers, data=request_data)
     response_json = response_str.json()
     case_Id = response_json["caseInfo"]["cases"][0]["caseId"]
     return case_Id
