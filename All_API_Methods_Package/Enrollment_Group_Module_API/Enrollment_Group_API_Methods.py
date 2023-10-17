@@ -1,6 +1,7 @@
 import json
 import requests
 from API_Utilities.Api_Base import login_token, API_Base_Utilities, time_entry, response_validation, excel_result
+from All_API_Methods_Package.User_Roles_Module_API.User_Role_Methods import random_number
 from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
 from Config_Package.API_INI_Config_Files.Expected_Enrollment_Group_Response_Msg_Read_ini import \
     Read_Expected_Enrollment_Group_Response_msg
@@ -441,12 +442,14 @@ def create_enrollment_group_request(row_no):
     headers = {"Token": token, "Content-Type": "application/json"}
     data = create_enrollment_group_test_data(row_no)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_group_endpoint()}"
-    request_body = {"name": data[0], "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
+    name = f"{data[0]}{random_number()}"
+    request_body = {"name": name, "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
                     "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
+    print(response_json)
     data = response_json["data"]
     return request_body, response_str, response_json, data
 
@@ -464,6 +467,7 @@ def create_enrollment_group_with_addCaseGroupZone_request():
     request_data = json.dumps(request_body)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
+    print(response_json)
     return request_body, response_str, response_json, account_id, cGroupId
 
 

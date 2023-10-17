@@ -19,23 +19,23 @@ class Test_Account_api(API_Base_Utilities):
         else:
             assert False
 
-    # def test_Account_Test_03(self):
-    #     self.logger.info("test_Account_Test_03  : Execution Started >>")
-    #     if Audit_API_Methods(self.logger).verify_audit_login():
-    #         assert True
-    #     else:
-    #         assert False
-    #
-    # def test_Account_Test_04(self):
-    #     self.logger.info("test_Account_Test_04  : Execution Started >>")
-    #     if Audit_API_Methods(self.logger).verify_get_audit_logins():
-    #         assert True
-    #     else:
-    #         assert False
-    #
-    # def test_Account_Test_05(self):
-    #     self.logger.info("test_Account_Test_05  : Execution Started >>")
-    #     if Audit_API_Methods(self.logger).verify_audit_threshold_changes():
-    #         assert True
-    #     else:
-    #         assert False
+    def test_Account_Test_03(self):
+        self.logger.info("test_Account_Test_03  : Execution Started >>")
+        if Audit_API_Methods(self.logger).verify_audit_login():
+            assert True
+        else:
+            assert False
+
+    def test_Account_Test_04(self):
+        self.logger.info("test_Account_Test_04  : Execution Started >>")
+        if Audit_API_Methods(self.logger).verify_get_audit_logins():
+            assert True
+        else:
+            assert False
+
+    def test_Account_Test_05(self):
+        self.logger.info("test_Account_Test_05  : Execution Started >>")
+        if Audit_API_Methods(self.logger).verify_audit_threshold_changes():
+            assert True
+        else:
+            assert False

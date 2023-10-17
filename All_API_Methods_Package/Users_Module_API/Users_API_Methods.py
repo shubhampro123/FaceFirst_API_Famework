@@ -204,7 +204,7 @@ class Users_API_Methods:
             self.response = response_list[1]
             self.json_response = response_list[2]
             self.act_msg = self.json_response["message"]
-            self.exp_msg = f"User  {self.json_response['data']} is updated."
+            self.exp_msg = Read_Expected_users_Response_msg().edit_password_success_msg()
             if response_validation(self.response) and self.act_msg == self.exp_msg:
                 excel_result(self.row, "Test_08", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg, True, self.sheet_name)
@@ -773,17 +773,15 @@ def edit_user_password():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_user_password_endpoint()}"
     r_data = user_create_request(2)
     headers = {"Token": token, "Content-Type": "application/json"}
-    id_data = get_user_request()
     user_id = r_data[3]
     username = r_data[5]
     current_password = r_data[6]
     data = update_password_test_data(13)
     request_body = {"userName": username, "userId": user_id, "currentPassword": current_password,
-                    "newPassword": data[3], "isServiceUserRequest": data[4]}
+                    "newPassword": data[3], "isServiceUserRequest": data[4], "isPasswordExpired": True}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()
-    print(response_json)
     return request_body, response_str, response_json
 
 

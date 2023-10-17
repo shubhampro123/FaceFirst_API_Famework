@@ -48,3 +48,10 @@ class Read_Expected_users_Response_msg:
         except Exception as ex:
             print(ex)
 
+    def edit_password_success_msg(self):
+        try:
+            ele = self.config.get('MESSAGE', 'edit_password_success_msg')
+            return ele
+        except Exception as ex:
+            print(ex)
+

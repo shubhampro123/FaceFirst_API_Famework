@@ -54,7 +54,6 @@ class Tags_API_Methods:
             return False
 
     def verify_all_get_tag_data(self):
-        # get_all_tags()
         result = []
         try:
             self.row = 3

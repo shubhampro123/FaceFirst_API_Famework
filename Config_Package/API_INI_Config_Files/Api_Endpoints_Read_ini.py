@@ -194,6 +194,13 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def all_module_search_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'all_module_search_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def user_role_result_sheet_name(self):
         try:
             ele = self.config.get('TEST_RESULT_SHEET_NAME', 'user_role_result_sheet_name')
@@ -204,6 +211,13 @@ class Read_API_Endpoints:
     def get_user_role_endpoint(self):
         try:
             ele = self.config.get('USER_ROLE', 'get_user_role_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def events_search_endpoint(self):
+        try:
+            ele = self.config.get('All_Module_Search_API', 'events_search_endpoint')
             return ele
         except Exception as ex:
             print(ex)
@@ -344,6 +358,13 @@ class Read_API_Endpoints:
     def get_all_enrollment_endpoint(self):
         try:
             ele = self.config.get('ENROLLMENT', 'get_all_enrollment_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_visitor_search_jobs_search_endpoint(self):
+        try:
+            ele = self.config.get('VISITORS_SEARCH_JOBS', 'get_visitor_search_jobs_search_endpoint')
             return ele
         except Exception as ex:
             print(ex)
@@ -533,6 +554,13 @@ class Read_API_Endpoints:
     def account_result_sheet_name(self):
         try:
             ele = self.config.get('TEST_RESULT_SHEET_NAME', 'account_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def all_module_search_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'all_module_search_result_sheet_name')
             return ele
         except Exception as ex:
             print(ex)
@@ -817,6 +845,13 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def visitors_search_end_point(self):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'visitors_search_end_point')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def fed_search_status_endpoint(self):
         try:
             ele = self.config.get('VISITOR_SEARCH', 'fed_search_status_endpoint')
@@ -837,7 +872,6 @@ class Read_API_Endpoints:
             return ele
         except Exception as ex:
             print(ex)
-
 
     def note_search_endpoint(self):
         try:
