@@ -761,10 +761,10 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def fed_search_status_endpoint(self):
+    def fed_search_status_endpoint(self, job_id):
         try:
             ele = self.config.get('VISITOR_SEARCH', 'fed_search_status_endpoint')
-            return ele
+            return ele.format(job_id)
         except Exception as ex:
             print(ex)
 
@@ -781,7 +781,6 @@ class Read_API_Endpoints:
             return ele
         except Exception as ex:
             print(ex)
-
 
     def note_search_endpoint(self):
         try:
@@ -801,5 +800,201 @@ class Read_API_Endpoints:
         try:
             ele = self.config.get('NOTES', 'get_by_enrollment_endpoint')
             return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_visitors_image_by_image_id_endpoint(self, image_id):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'get_visitors_image_by_image_id_endpoint')
+            return ele.format(image_id)
+        except Exception as ex:
+            print(ex)
+
+    def post_identify_alien_federated(self):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'post_identify_alien_federated')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def delete_alien_federated_endpoint(self, job_id):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'delete_alien_federated_endpoint')
+            return ele.format(job_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_alien_image_endpoint(self, image_id):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'get_alien_image_endpoint')
+            return ele.format(image_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_identify_alien_federated_status_endpoint(self, job_id):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'get_identify_alien_federated_status_endpoint')
+            return ele.format(job_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_query_alien_face_info_endpoint(self, image_id):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'get_query_alien_face_info_endpoint')
+            return ele.format(image_id)
+        except Exception as ex:
+            print(ex)
+
+    def put_identify_cancel_federated_endpoint(self, job_id):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'put_identify_cancel_federated_endpoint')
+            return ele.format(job_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_query_alien_federated_identification_log_endpoint(self, result_deleted, count):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'get_query_alien_federated_identification_log_endpoint')
+            return ele.format(result_deleted, count)
+        except Exception as ex:
+            print(ex)
+
+    def post_visitor_search_endpoint(self, start, limit, sort_direction):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'post_visitor_search_endpoint')
+            return ele.format(start, limit, sort_direction)
+        except Exception as ex:
+            print(ex)
+
+    def get_visitor_count_by_zone_endpoint(self):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'get_visitor_count_by_zone_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_data_by_id_endpoint(self, case_id):
+        try:
+            ele = self.config.get('ENROLLMENT_DATA', 'get_enrollment_data_by_id_endpoint')
+            return ele.format(case_id)
+        except Exception as ex:
+            print(ex)
+
+    def enrollment_data_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'enrollment_data_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def enrollment_data_test_results_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'enrollment_data_test_results_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_data_by_page_number_and_batch_size_request_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT_DATA', 'get_enrollment_data_by_page_number_and_batch_size_request_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_data_count_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT_DATA', 'get_enrollment_data_count_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def enrollment_group_data_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'enrollment_group_data_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def enrollment_group_data_test_results_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'enrollment_group_data_test_results_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_group_data_by_id_endpoint(self, c_group_id):
+        try:
+            ele = self.config.get('ENROLLMENT_GROUP_DATA', 'get_enrollment_group_data_by_id_endpoint')
+            return ele.format(c_group_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_group_data_by_page_number_and_batch_size_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT_GROUP_DATA', 'get_enrollment_group_data_by_page_number_and_batch_size_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_group_data_count_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT_GROUP_DATA', 'get_enrollment_group_data_count_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_all_enrollment_template_data_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'get_all_enrollment_template_data_endpoint')
+            return ele.format()
+        except Exception as ex:
+            print(ex)
+
+    def enrollment_template_data_test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'enrollment_template_data_test_data_sheet_name')
+            return ele.format()
+        except Exception as ex:
+            print(ex)
+
+    def enrollment_template_data_test_results_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'enrollment_template_data_test_results_sheet_name')
+            return ele.format()
+        except Exception as ex:
+            print(ex)
+
+    def post_enrollment_template_data_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'post_enrollment_template_data_endpoint')
+            return ele.format()
+        except Exception as ex:
+            print(ex)
+
+    def delete_enrollment_template_data_endpoint(self, case_id):
+        try:
+            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'delete_enrollment_template_data_endpoint')
+            return ele.format(case_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_template_data_count_endpoint(self):
+        try:
+            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'get_enrollment_template_data_count_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_enrollment_template_data_by_id_endpoint(self, enrollment_id):
+        try:
+            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'get_enrollment_template_data_by_id_endpoint')
+            return ele.format(enrollment_id)
+        except Exception as ex:
+            print(ex)
+
+    def put_enrollment_template_data_endpoint(self, enrollment_id):
+        try:
+            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'put_enrollment_template_data_endpoint')
+            return ele.format(enrollment_id)
         except Exception as ex:
             print(ex)

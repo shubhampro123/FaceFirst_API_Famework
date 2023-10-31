@@ -1,4 +1,6 @@
 import json
+import random
+
 import requests
 from API_Utilities.Api_Base import login_token, API_Base_Utilities, time_entry, response_validation, excel_result
 from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
@@ -436,12 +438,17 @@ def get_all_enrollment_group_request():
     return response_str, response_json
 
 
+def random_number():
+    r_number = random.randint(1, 1000)
+    return r_number
+
+
 def create_enrollment_group_request(row_no):
     token = login_token()
     headers = {"Token": token, "Content-Type": "application/json"}
     data = create_enrollment_group_test_data(row_no)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_group_endpoint()}"
-    request_body = {"name": data[0], "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
+    request_body = {"name": f"{data[0]}{random_number}", "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
                     "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
