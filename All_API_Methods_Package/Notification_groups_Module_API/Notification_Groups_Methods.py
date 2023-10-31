@@ -447,7 +447,7 @@ def create_notification_groups_without_users_enrollment_group_zone_test_data(row
 
 def get_user_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -463,7 +463,7 @@ def create_notification_group_with_users_enrollment_group_zones():
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_alert_groups_endpoint()}"
     data = create_notification_groups_with_users_enrollment_group_zone_test_data(2)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     username = f"{data[0]}{random_number()}"
     request_body = {"name": username, "description": data[1], "ownerID": user_info_list[0], "userIds": [user_info_list[3]],
                     "caseGroupIdsUserIds": [case_group_id],"zoneIds":[all_users_zone_id]}
@@ -478,7 +478,7 @@ def create_notification_group_without_users_enrollment_group_zones():
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_alert_groups_endpoint()}"
     data = create_notification_groups_without_users_enrollment_group_zone_test_data(4)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     username = f"{data[2]}{random_number()}"
     request_body = {"agroupID": bool(data[0]), "description": data[1], "name": username, "ownerID": user_info_list[0],
                     "set_cgroups": data[4]}
@@ -493,7 +493,7 @@ def create_duplicate_notification_group(alert_name):
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_alert_groups_endpoint()}"
     data = create_notification_groups_without_users_enrollment_group_zone_test_data(4)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": bool(data[0]), "description": data[1], "name": alert_name, "ownerID": user_info_list[0],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
@@ -504,7 +504,7 @@ def create_duplicate_notification_group(alert_name):
 
 def get_all_notification_groups():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_alert_groups_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -513,7 +513,7 @@ def get_all_notification_groups():
 
 def get_notification_group_using_id(a_group_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_alert_group_using_ID(a_group_id)}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -527,7 +527,7 @@ def edit_alert_group_request(alert_id, alert_name):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_alert_group_ID(alert_id)}"
     print(url)
     data = edit_alert_group_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": alert_id, "description": data[1], "name": alert_name, "ownerID":user_info_list[3],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
@@ -551,7 +551,7 @@ def add_user_to_alert_group_request(alert_id):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_user_to_alert_group()}"
     print(url)
     data = add_user_to_alert_group_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": alert_id, "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
     print("request_data",request_data)
@@ -576,7 +576,7 @@ def remove_user_from_alert_group_request(alert_id):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_remove_user_from_alert_group()}"
     print(url)
     data = remove_user_from_alert_group_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": alert_id, "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
     print("request_data",request_data)
@@ -604,9 +604,8 @@ def get_user_info():
     :return:
     """
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_main_user_info()}"
-    print(url)
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
     return response_json["accountId"], response_json["regionId"], response_json["userName"], response_json["userId"], response_json["userRoleId"]
@@ -618,7 +617,7 @@ def get_all_device_zone_id():
     :return: zone id
     """
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_zone_id()}"
     print(url)
     response_str = requests.get(url, headers=headers)
@@ -634,7 +633,7 @@ def get_enrollment_group_id():
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_case_group()}"
     data = create_case_groups_test_data(4)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     enrollment_name = f"{data[0]}{random_number()}"
     request_body = {"name": enrollment_name, "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6], "alertHexColor": data[7], "activeThreat": data[8]}
@@ -651,7 +650,7 @@ def create_case_groups_test_data(row_no):
 
 def get_delete_user_request(alert_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_alert_group(alert_id)}"
     response_str = requests.delete(url, headers=headers)
     response_json = response_str.json()
@@ -662,7 +661,7 @@ def add_enrollment_to_alert_group_request(enrollment_group_id, alert_id):
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_enrollment_group_to_alert_group()}"
     print(url)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"CGroupID": enrollment_group_id, "AGroupID": alert_id}
     request_data = json.dumps(request_body)
     print("request_data",request_data)

@@ -99,7 +99,6 @@ class User_Role_API_Methods:
             response_list = update_user_role_request(self.row)
             self.r_body = response_list[0]
             self.response = response_list[1]
-            print(self.response)
             self.json_response = response_list[2]
             self.act_msg = self.json_response["roleName"]
             self.exp_msg = response_list[3]
@@ -242,7 +241,7 @@ def create_user_role_request(row_no):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().user_role_endpoint()}"
     data = user_role_test_data(row_no)
     role_name = f"{data[0]}{random_number()}"
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_data = {"rolename": role_name, "enabled": data[1], "description": data[2],
                     "permissions": {"user": data[3], "alert": data[4], "alertGroup": data[5], "station": data[6],
                                     "blob": data[7],
@@ -257,9 +256,7 @@ def create_user_role_request(row_no):
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
     response_str = requests.post(url, data=request_data, headers=headers)
-    print(response_str)
     response_json = response_str.json()
-    # print(response_json)
     role_id = response_json["id"]
     return request_data, response_str, response_json, role_name, role_id
 
@@ -272,8 +269,7 @@ def update_user_role_request(row_no):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().update_user_role_endpoint()}"
     data = user_role_test_data(row_no)
     role_name = data[0]
-    print(role_name)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_data = {"rolename": role_name, "enabled": data[1], "description": data[2],
                     "permissions": {"user": data[3], "alert": data[4], "alertGroup": data[5], "station": data[6],
                                     "blob": data[7],
@@ -287,9 +283,7 @@ def update_user_role_request(row_no):
                                     "profile": data[24],
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
-    print(request_data)
     response_str = requests.put(url, data=request_data, headers=headers)
-    # print(request_data)
     response_json = response_str.json()
     return request_data, response_str, response_json, role_name
 
@@ -299,7 +293,7 @@ def create_user_role_request_disable(row_no):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().user_role_endpoint()}"
     data = user_role_test_data(row_no)
     role_name = f"{data[0]}{random_number()}"
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_data = {"rolename": role_name, "enabled": data[1], "description": data[2],
                     "permissions": {"user": data[3], "alert": data[4], "alertGroup": data[5], "station": data[6],
                                     "blob": data[7],
@@ -315,14 +309,13 @@ def create_user_role_request_disable(row_no):
     request_data = json.dumps(request_data)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
-    print(response_json)
     role_id = response_json["id"]
     return request_data, response_str, response_json, role_name, role_id
 
 
 def get_single_user_role():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     data = create_user_role_request(2)
     role_id_exp = data[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_user_role_endpoint()}"
@@ -337,7 +330,7 @@ def get_single_user_role():
 
 def get_all_user_role():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     data = create_user_role_request(2)
     role_id_exp = data[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_user_role_endpoint()}"
@@ -352,7 +345,7 @@ def get_all_user_role():
 
 def get_user_role_by_id_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     role_id = create_user_role_request(2)[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_user_role_by_id_endpoint(role_id)}"
     response_str = requests.get(url, headers=headers)
@@ -363,13 +356,11 @@ def get_user_role_by_id_request():
 
 def del_user_role_by_id_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     role_id = create_user_role_request(2)[4]
-    print(role_id)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().del_user_role_by_id_endpoint(role_id)}"
     response_str = requests.delete(url, headers=headers)
     response_json = response_str.json()
-    print(response_json)
     # act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
     return response_str, response_json, role_id
 

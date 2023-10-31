@@ -105,8 +105,8 @@ class Test_identify_enroll_api(API_Base_Utilities):
             assert False
 
     @pytest.mark.p1
-    def test_identify_enroll_Test_12(self):
-        self.logger.info("test_identify_enroll_Test_12  : Execution Started >>")
+    def test_identify_enroll_Test_13(self):
+        self.logger.info("test_identify_enroll_Test_13  : Execution Started >>")
         if Identify_Enroll_API_Methods(self.logger).verify_query_enrollment_info():
             assert True
         else:

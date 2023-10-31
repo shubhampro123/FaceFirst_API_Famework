@@ -796,6 +796,69 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def get_region_by_id_endpoint(self, id_value):
+        try:
+            ele = self.config.get('REGION', 'get_region_by_id_endpoint')
+            return ele.format(id_value)
+        except Exception as ex:
+            print(ex)
+
+    def get_region_import_file(self):
+        try:
+            ele = self.config.get('REGION', 'get_region_import_file')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_region_by_region_path(self, id_value):
+        try:
+            ele = self.config.get('REGION', 'get_region_by_region_path')
+            return ele.format(id_value)
+        except Exception as ex:
+            print(ex)
+
+    def get_region_by_descendants(self, id_value):
+        try:
+            ele = self.config.get('REGION', 'get_region_by_descendants')
+            return ele.format(id_value)
+        except Exception as ex:
+            print(ex)
+
+    def create_by_migrate_events(self, zone_id):
+        try:
+            ele = self.config.get('REGION', 'create_by_migrate_events')
+            return ele.format(zone_id)
+        except Exception as ex:
+            print(ex)
+
+    def get_region_id_by_cameras(self, region_id):
+        try:
+            ele = self.config.get('REGION', 'get_region_id_by_cameras')
+            return ele.format(region_id)
+        except Exception as ex:
+            print(ex)
+
+    def create_region_by_descendants(self, region_id):
+        try:
+            ele = self.config.get('REGION', 'create_region_by_descendants')
+            return ele.format(region_id)
+        except Exception as ex:
+            print(ex)
+
+    def delete_region_endpoint(self, region_id):
+        try:
+            ele = self.config.get('REGION', 'delete_region_endpoint')
+            return ele.format(region_id)
+        except Exception as ex:
+            print(ex)
+
+    def create_move_regions(self):
+        try:
+            ele = self.config.get('REGION', 'create_move_regions')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def get_tags_endpoint(self):
         try:
             ele = self.config.get('TAGS', 'get_tags_endpoint')
@@ -820,6 +883,13 @@ class Read_API_Endpoints:
     def region_result_sheet_name(self):
         try:
             ele = self.config.get('TEST_RESULT_SHEET_NAME', 'region_result_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def integration_result_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'integration_result_sheet_name')
             return ele
         except Exception as ex:
             print(ex)
@@ -869,6 +939,13 @@ class Read_API_Endpoints:
     def visitor_search_test_data_sheet_name(self):
         try:
             ele = self.config.get('TEST_DATA_SHEET_NAME', 'visitor_search_test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def region_module_test_module(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'region_module_test_module')
             return ele
         except Exception as ex:
             print(ex)

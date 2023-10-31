@@ -94,15 +94,19 @@ class Visitors_Search_API_Methods:
 
 def start_search_request(row_no):
     token = login_token()
+    print(token)
     # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
     data = visitor_search_test_data(row_no)
+    print(data)
     start_search = f"{data[0]}"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
-    headers = {"Token": token}
+    print(url)
+    headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": data, "StartDateTime": data[1], "EndDateTime": data[2], "regionId": data[3]}
     # files = [
     #     ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     # ]
+    print(request_data)
     response_str = requests.post(url, headers=headers, data=request_data)
     response_json = response_str.json()
     print(response_json)
@@ -114,7 +118,7 @@ def start_search_request(row_no):
 
 # def get_fed_search_by_job_id_request():
 #     token = login_token()
-#     headers = {"Token": token}
+#     headers = {"Authorization": f"Token {token}"}
 #     job_id = create_job_id_request(2)[4]
 #     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().fed_search_status_endpoint()}"
 #     response_str = requests.get(url, headers=headers)

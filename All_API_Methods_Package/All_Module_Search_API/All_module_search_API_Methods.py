@@ -230,7 +230,7 @@ class All_Module_Search_API_Methods:
 def get_event_search():
     token = login_token()
     print(token)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     data = events_test_data(2)
     print(data)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().events_search_endpoint()}"
@@ -251,7 +251,7 @@ def get_user_by_id_request():
     data = get_user_request()
     user_id = data[2]
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_by_id_endpoint()}"
     params = {"id": user_id}
     response_str = requests.get(url, headers=headers, params=params)
@@ -261,7 +261,7 @@ def get_user_by_id_request():
 
 def get_user_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -272,7 +272,7 @@ def get_user_request():
 
 def get_visitors_request():
     token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().visitors_search_end_point()}"
     data = visitors_search_data(6)
     print(data)
@@ -295,7 +295,7 @@ def notes_search_request():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().note_search_endpoint()}"
     print(url)
     data = notes_search_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"caseNumber": data[0],
                     "storeId": data[1],
                     "Count": data[2],
@@ -324,7 +324,7 @@ def create_notes_request():
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
 
     print(request_body)
     response_str = requests.post(url, request_body, headers=headers, files=files)
@@ -335,7 +335,7 @@ def create_notes_request():
 
 def get_profile_id():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}api/Profiles"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -344,7 +344,7 @@ def get_profile_id():
 
 def get_enrollment_group_by_id():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     data = create_enrollment_group_request(3)
     form_data = {"id": data[3]}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_group_endpoint()}"
@@ -355,7 +355,7 @@ def get_enrollment_group_by_id():
 
 def get_visitor_search_jobs_search():
     token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     user_id = get_user_request()
     data = visitors_search_job_data(8)
     print(data)

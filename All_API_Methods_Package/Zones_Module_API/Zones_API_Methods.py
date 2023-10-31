@@ -29,14 +29,16 @@ class Zones_API_Methods:
                 result.append(self.json_response["zoneInfo"]["zones"][x]["zoneId"] != "")
 
             if response_validation(self.response) and False not in result:
-                excel_result(self.row,"Test_01", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
                              True, self.sheet_name)
                 time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(True)
             else:
                 self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
                 self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
-                excel_result(self.row,"Test_01", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
                              False, self.sheet_name)
                 time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(False)
@@ -46,7 +48,7 @@ class Zones_API_Methods:
                 return True
         except Exception as ex:
             print(ex)
-            excel_result(self.row,"Test_01", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+            excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
                          False, self.sheet_name)
             self.log.info(f"test_Zones_Test_01_Exception:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
@@ -64,14 +66,16 @@ class Zones_API_Methods:
             ac_zones_id = self.json_response["zoneInfo"]["zones"][0]["zoneId"]
             print(response_list)
             if response_validation(self.response) and ex_zone_id == ac_zones_id:
-                excel_result(self.row,"Test_02", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
                              True, self.sheet_name)
                 time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(True)
             else:
                 self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
                 self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
-                excel_result(self.row,"Test_02", self.r_body, self.json_response, self.response.status_code, self.act_msg,
+                excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
                              False, self.sheet_name)
                 time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
                 result.append(False)
@@ -81,7 +85,7 @@ class Zones_API_Methods:
                 return True
         except Exception as ex:
             print(ex)
-            excel_result(self.row,"Test_02", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+            excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
                          False, self.sheet_name)
             self.log.info(f"test_Zones_Test_02_Exception:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
@@ -90,7 +94,7 @@ class Zones_API_Methods:
 
 def get_all_zones():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -99,7 +103,7 @@ def get_all_zones():
 
 def get_single_zone_by_id(zone_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_zone_by_id_endpoint(zone_id)}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()

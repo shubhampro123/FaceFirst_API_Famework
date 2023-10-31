@@ -207,11 +207,10 @@ class Audit_API_Methods:
             return False
 
 
-
 ######################################Reusable methods#########################################################
 def get_all_account():
     token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_audit_approvers_endpoint()}"
     print(url)
     userid_data = get_user_request()
@@ -227,7 +226,7 @@ def get_all_account():
 
 def get_all_account_user():
     token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_audit_users_endpoint()}"
     print(url)
     userid_data = get_user_request()
@@ -244,7 +243,7 @@ def get_all_account_user():
 
 def get_all_account_login():
     token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_audit_login_endpoint()}"
     print(url)
     userid_data = get_user_request()
@@ -260,7 +259,7 @@ def get_all_account_login():
 
 def get_all_login_users():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_request_audit_logins()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -269,7 +268,7 @@ def get_all_login_users():
 
 def verify_audit_threshold_changes():
     token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_request_audit_threshold_changes()}"
     data = get_all_account_test_data(5)
     request_body = {"endDate": data[2], "startDate": data[1], "userIds": [None]}
