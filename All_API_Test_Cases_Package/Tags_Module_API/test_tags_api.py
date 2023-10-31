@@ -3,7 +3,7 @@ from All_API_Methods_Package.Tags_Module_API.Tags_API_Methods import Tags_API_Me
 
 
 class Test_tags_api(API_Base_Utilities):
-    logger = API_Base_Utilities.logger_object()
+    logger = API_Base_Utilities().get_logger()
 
     def test_tags_Test_01(self):
         self.logger.info("test_tags_Test_01  : Execution Started >>")
@@ -34,7 +34,7 @@ class Test_tags_api(API_Base_Utilities):
             assert False
 
     def test_tags_Test_05(self):
-        self.logger.info("test_tags_Test_04  : Execution Started >>")
+        self.logger.info("test_tags_Test_05  : Execution Started >>")
         if Tags_API_Methods(self.logger).verify_create_tag_with_tag_alert():
             assert True
         else:

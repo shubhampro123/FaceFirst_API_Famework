@@ -125,7 +125,7 @@ class Account_API_Methods:
 
 def get_all_account():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_account_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -134,7 +134,7 @@ def get_all_account():
 
 def get_single_account_by_account_id(account_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_account_by_account_id_endpoint(account_id)}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -143,7 +143,7 @@ def get_single_account_by_account_id(account_id):
 
 def get_account_stations_by_account_id(account_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_account_stations_by_account_id_endpoint(account_id)}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()

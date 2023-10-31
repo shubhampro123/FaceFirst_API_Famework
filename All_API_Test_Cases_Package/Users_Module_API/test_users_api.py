@@ -54,12 +54,12 @@ class Test_Users_api(API_Base_Utilities):
         else:
             assert False
 
-    # def test_Users_Test_09(self):
-    #     self.logger.info("test_Users_Test_09  : Execution Started >>")
-    #     if Users_API_Methods(self.logger).verify_edit_user_password():
-    #         assert True
-    #     else:
-    #         assert False
+    def test_Users_Test_09(self):
+        self.logger.info("test_Users_Test_09  : Execution Started >>")
+        if Users_API_Methods(self.logger).verify_edit_user_password():
+            assert True
+        else:
+            assert False
 
     def test_Users_Test_10(self):
         self.logger.info("test_Users_Test_10  : Execution Started >>")

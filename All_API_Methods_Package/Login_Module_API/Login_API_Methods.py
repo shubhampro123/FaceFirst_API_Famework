@@ -306,6 +306,7 @@ def login_request(row_no):
 
 def get_login_request():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_login_endpoint()}"
+    print(url)
     response_str = requests.get(url)
     response_json = response_str.json()
     return response_str, response_json
@@ -321,8 +322,7 @@ def get_query_login_info_request():
 
 def logout_request():
     token = login_token()
-    cookies = login_Cookie()
-    headers = {"Token": token, "Content-Type": "application/json; charset=utf-8", "Cookie": cookies}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().logout_endpoint()}"
     response_str = requests.post(url, headers=headers)
     response_json = response_str.json()

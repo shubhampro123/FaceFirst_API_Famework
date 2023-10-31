@@ -51,7 +51,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_group_Test_01:  {ex}")
@@ -86,7 +85,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_02:  {ex}")
@@ -122,7 +120,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_03", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_03:  {ex}")
@@ -157,7 +154,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_04:  {ex}")
@@ -171,7 +167,6 @@ class Notes_API_Methods:
             time_entry(self.row, "start_time", self.sheet_name)
             note_id = create_notes_request()[2]["data"]["id"]
             response_list = clear_notes_request(note_id)
-            print("response_list",response_list)
             self.r_body = response_list[0]
             self.response = response_list[1]
             self.json_response = response_list[2]
@@ -194,7 +189,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_05", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_05:  {ex}")
@@ -208,7 +202,6 @@ class Notes_API_Methods:
             time_entry(self.row, "start_time", self.sheet_name)
             note_id = create_notes_request()[2]["data"]["id"]
             response_list = add_image_request(note_id)
-            print("response_list",response_list)
             self.r_body = response_list[0]
             self.response = response_list[1]
             self.json_response = response_list[2]
@@ -231,7 +224,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_06", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_06:  {ex}")
@@ -262,7 +254,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_07", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_07:  {ex}")
@@ -299,7 +290,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_08", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_08:  {ex}")
@@ -333,7 +323,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_09", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_09:  {ex}")
@@ -367,7 +356,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_10", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_10:  {ex}")
@@ -401,7 +389,6 @@ class Notes_API_Methods:
             else:
                 return True
         except Exception as ex:
-            print(ex)
             excel_result(self.row, "Test_11", self.r_body, self.json_response, self.response.status_code, self.act_msg,
                          False, self.sheet_name)
             self.log.info(f"test_notes_Test_11:  {ex}")
@@ -425,18 +412,15 @@ def create_notes_request():
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    headers = {"Token": token}
-
-    print(request_body)
+    headers = {"Authorization": f"Token {token}"}
     response_str = requests.post(url, request_body, headers=headers, files=files)
     response_json = response_str.json()
-    print("response_json",response_json)
     return request_body, response_str, response_json
 
 
 def get_profile_id():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}api/Profiles"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -453,7 +437,7 @@ def create_enrollment_data(row_no):
 
 def get_notes_using_id(note_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_notes_endpoint(note_id)}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -464,9 +448,8 @@ def edit_notes_request(note_id):
     test_data_row = 4
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().update_notes_endpoint()}"
-    print(url)
     data = edit_notes_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"gender": data[0], "build": data[1], "bodyMarkings": data[2], "narrativeDesc": data[3],
                     "action": data[4], "storeId": data[5], "caseNumber": data[6],
                     "timeIncident": data[7], "reportedBy": data[8], "reportedLoss": str(data[9]),
@@ -478,6 +461,7 @@ def edit_notes_request(note_id):
     print(request_data)
     response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()
+    print(response_json)
     return request_body, response_str, response_json
 
 
@@ -491,7 +475,7 @@ def edit_notes_test_data(row_no):
 
 def delete_notes_request(note_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_notes_endpoint(note_id)}"
     response_str = requests.delete(url, headers=headers)
     response_json = response_str.json()
@@ -502,14 +486,12 @@ def clear_notes_request(note_id):
     test_data_row = 6
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().clear_notes_endpoint()}"
-    print(url)
     data = clear_notes_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"fields": [data[0]],
                     "NoteId": note_id
                     }
     request_data = json.dumps(request_body)
-    print(request_data)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
     return request_body, response_str, response_json
@@ -530,19 +512,15 @@ def add_image_request(note_id):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().images_bulk_endpoint(note_id)}"
     data = add_image_test_data(test_data_row)
     request_body = {
-                    "NoteId": note_id
-                    }
+        "NoteId": note_id
+    }
 
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    headers = {"Token": token}
-
-    print("files",files)
-    print(request_body)
+    headers = {"Authorization": f"Token {token}"}
     response_str = requests.post(url, request_body, headers=headers, files=files)
     response_json = response_str.json()
-    print("response_json",response_json)
     return request_body, response_str, response_json
 
 
@@ -556,22 +534,19 @@ def add_image_test_data(row_no):
 
 def get_image_using_note_id(note_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_images_endpoint(note_id)}"
-    print(url)
     request_body = {"thumbnail_width": "200"}
     response_str = requests.get(url, headers=headers, params=request_body)
-    print(response_str)
     return response_str
 
 
-def delete_image_request(note_id,image_id):
+def delete_image_request(note_id, image_id):
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_images_endpoint(note_id)}"
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"noteId": note_id, "imageIds": [image_id]}
     request_data = json.dumps(request_body)
-    print(request_data)
     response_str = requests.delete(url, data=request_data, headers=headers)
     response_json = response_str.json()
     return request_body, response_str, response_json
@@ -581,9 +556,8 @@ def notes_search_request():
     test_data_row = 10
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().note_search_endpoint()}"
-    print(url)
     data = notes_search_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"caseNumber": data[0],
                     "storeId": data[1],
                     "Count": data[2],
@@ -592,7 +566,6 @@ def notes_search_request():
                     "OrderBy": data[5]
                     }
     request_data = json.dumps(request_body)
-    print(request_data)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
     return request_body, response_str, response_json
@@ -610,18 +583,16 @@ def aggregates_by_geospatial_request():
     test_data_row = 12
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().aggregates_by_geospatial_endpoint()}"
-    print(url)
     data = aggregates_by_geospatial_test_data(test_data_row)
     lat_long_list = data[0].split(",")
     lat = float(lat_long_list[0])
     lon_g = float(lat_long_list[1])
-    headers = {"Token": token, "Content-Type": "application/json"}
-    request_body = {"geoCenter": [lat,lon_g],
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
+    request_body = {"geoCenter": [lat, lon_g],
                     "geoMaxDistance": data[1],
                     "regionIds": [get_region_id()],
                     }
     request_data = json.dumps(request_body)
-    print(request_data)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
     return request_body, response_str, response_json
@@ -629,7 +600,7 @@ def aggregates_by_geospatial_request():
 
 def get_region_id():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
     response_str = requests.get(url, headers=headers)
     return response_str.json()["zoneInfo"]["zones"][1]["regionId"]
@@ -659,12 +630,9 @@ def create_notes_to_a_person_request():
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    headers = {"Token": token}
-
-    print(request_body)
+    headers = {"Authorization": f"Token {token}"}
     response_str = requests.post(url, request_body, headers=headers, files=files)
     response_json = response_str.json()
-    print("response_json",response_json)
     return request_body, response_str, response_json, case_id
 
 
@@ -672,9 +640,8 @@ def get_by_enrollment_request(case_id):
     test_data_row = 14
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_by_enrollment_endpoint()}"
-    print(url)
     data = get_by_enrollment_test_data(test_data_row)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"caseId": case_id,
                     "count": data[1],
                     "includeCaseIds": data[2],
@@ -682,10 +649,8 @@ def get_by_enrollment_request(case_id):
                     "orderBy": data[4]
                     }
     request_data = json.dumps(request_body)
-    print(request_data)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
-    print(response_json)
     return request_body, response_str, response_json
 
 

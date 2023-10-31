@@ -61,7 +61,7 @@ def create_detect_face_request(row_no):
     data = detect_face_test_data(row_no)
     detect_faces = f"{data[0]}"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().detect_face_endpoint()}"
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     request_data = {"MaxFaces": data[0], "DetectionThreshold": data[1], "MinEyeDistance": data[2],
                     "IncludeEyeCoordinates": data[3]}
 
@@ -69,9 +69,7 @@ def create_detect_face_request(row_no):
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
     response_str = requests.post(url, headers=headers, data=request_data, files=files)
-    print(response_str)
     response_json = response_str.json()
-    print(response_json)
     # role_id = response_json["id"]
     return response_str, response_json, detect_faces
 

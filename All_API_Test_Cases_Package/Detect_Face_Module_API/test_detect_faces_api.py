@@ -3,7 +3,7 @@ from All_API_Methods_Package.Detect_Face_Module_API.Detect_Faces_API_Methods imp
 
 
 class Test_detect_face_api(API_Base_Utilities):
-    logger = API_Base_Utilities.get_logger()
+    logger = API_Base_Utilities().get_logger()
 
     def test_tags_Test_01(self):
         self.logger.info("test_detect_face_Test_01  : Execution Started >>")

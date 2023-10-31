@@ -3,6 +3,7 @@ import random
 
 import requests
 from API_Utilities.Api_Base import login_token, API_Base_Utilities, time_entry, response_validation, excel_result
+from All_API_Methods_Package.User_Roles_Module_API.User_Role_Methods import random_number
 from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
 from Config_Package.API_INI_Config_Files.Expected_Enrollment_Group_Response_Msg_Read_ini import \
     Read_Expected_Enrollment_Group_Response_msg
@@ -27,8 +28,7 @@ class Enrollment_Group_API_Methods:
             self.row = 2
             time_entry(self.row, "start_time", self.sheet_name)
             response_list = get_all_enrollment_group_request()
-            self.response = response_list[0]
-            self.json_response = response_list[1]
+            self.response = response_list
             print(response_validation(self.response))
             if response_validation(self.response):
                 excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code,
@@ -431,29 +431,29 @@ class Enrollment_Group_API_Methods:
 
 def get_all_enrollment_group_request():
     token = login_token()
-    headers = {"Token": token}
+    print(token)
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_group_endpoint()}"
+    print(url)
     response_str = requests.get(url, headers=headers)
-    response_json = response_str.json()
-    return response_str, response_json
-
-
-def random_number():
-    r_number = random.randint(1, 1000)
-    return r_number
+    print(response_str)
+    # response_json = response_str.json()
+    return response_str
 
 
 def create_enrollment_group_request(row_no):
     token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     data = create_enrollment_group_test_data(row_no)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_group_endpoint()}"
-    request_body = {"name": f"{data[0]}{random_number}", "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
+    name = f"{data[0]}{random_number()}"
+    request_body = {"name": name, "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
                     "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
+    print(response_json)
     data = response_json["data"]
     return request_body, response_str, response_json, data
 
@@ -461,7 +461,7 @@ def create_enrollment_group_request(row_no):
 def create_enrollment_group_with_addCaseGroupZone_request():
     token = login_token()
     data = create_enrollment_group_request(3)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_group_with_addCaseGroupZone_endpoint()}"
     cGroupId = data[3]
     zones_data = get_all_zones()
@@ -471,18 +471,19 @@ def create_enrollment_group_with_addCaseGroupZone_request():
     request_data = json.dumps(request_body)
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
+    print(response_json)
     return request_body, response_str, response_json, account_id, cGroupId
 
 
 def create_enrollment_group_with_verify_addCaseGroupCase_request():
     token = login_token()
     data = create_enrollment_group_request(3)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().addCaseGroupCase_endpoint()}"
     cGroupId = data[3]
     zones_data = get_all_zones()
     account_id = zones_data[1]
-    request_body = {"id": [account_id], "case_id": get_case_id(), "cgroup_id": cGroupId}
+    request_body = {"id": [account_id], "case_id": get_case_id(token), "cgroup_id": cGroupId}
     request_data = json.dumps(request_body)
     response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()
@@ -492,7 +493,7 @@ def create_enrollment_group_with_verify_addCaseGroupCase_request():
 def remove_enrollment_group_with_removeCaseGroupZone_request():
     token = login_token()
     data = create_enrollment_group_request(3)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().removeCaseGroupZone_endpoint()}"
     cGroupId = data[3]
     zones_data = get_all_zones()
@@ -508,12 +509,12 @@ def remove_enrollment_group_with_removeCaseGroupZone_request():
 def remove_enrollment_group_with_removeCaseGroupCase_request():
     token = login_token()
     data = create_enrollment_group_request(3)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().removeCaseGroupCase_endpoint()}"
     cGroupId = data[3]
     zones_data = get_all_zones()
     account_id = zones_data[1]
-    request_body = {"id": [account_id], "case_id": get_case_id(), "cgroup_id": cGroupId}
+    request_body = {"id": [account_id], "case_id": get_case_id(token), "cgroup_id": cGroupId}
     request_data = json.dumps(request_body)
     response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()
@@ -524,7 +525,7 @@ def remove_enrollment_group_with_addAlertGroupCase_request():
     token = login_token()
     data = create_enrollment_group_request(3)
     print(data[3])
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().addAlertGroupCase_endpoint()}"
     print(url)
     cGroupId = data[3]
@@ -541,7 +542,7 @@ def remove_enrollment_group_with_addAlertGroupCase_request():
 def remove_enrollment_group_with_removeAlertGroupCase_request():
     token = login_token()
     data = remove_enrollment_group_with_addAlertGroupCase_request()
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().removeAlertGroupCase_endpoint()}"
     cGroupId = data[4]
     aGroupId = data[3]
@@ -558,7 +559,7 @@ def update_enrollment_group_request(row_no):
     token = login_token()
     res = create_enrollment_group_request(3)
     group_id = res[3]
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     data = update_enrollment_group_test_data(row_no)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().update_enrollment_group_endpoint()}/{group_id}"
     request_body = {"name": data[0], "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
@@ -574,7 +575,7 @@ def delete_enrollment_group():
     token = login_token()
     res = create_enrollment_group_request(3)
     group_id = res[3]
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_enrollment_group_endpoint()}/{group_id}"
     response_str = requests.delete(url, headers=headers)
     response_json = response_str.json()
@@ -583,7 +584,7 @@ def delete_enrollment_group():
 
 def get_enrollment_group_by_id():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     data = create_enrollment_group_request(3)
     form_data = {"id": data[3]}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_group_endpoint()}"
@@ -610,7 +611,7 @@ def update_enrollment_group_test_data(row_no):
 
 def get_all_zones():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
     query_params = {"offset": 0}
     response_str = requests.get(url, params=query_params, headers=headers)
@@ -620,13 +621,12 @@ def get_all_zones():
     return data, account_id
 
 
-def get_case_id():
-    token = login_token()
-    headers = {"Token": token, "Content-Type": "application/json"}
+def get_case_id(token):
+    headers = {"Authorization": f"Token {token}", 'Content-Type': 'application/json'}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_endpoint()}"
     request_body = {"DetailLevel": 3, "Offset": 0, "count": 20, "Ascending": 0, "IsExact": False}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, headers=headers, data=request_data)
     response_json = response_str.json()
     case_Id = response_json["caseInfo"]["cases"][0]["caseId"]
     return case_Id
@@ -634,7 +634,7 @@ def get_case_id():
 
 def get_aGroup_id():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_alert_groups_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
