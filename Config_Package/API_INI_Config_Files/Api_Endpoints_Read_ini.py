@@ -1173,3 +1173,10 @@ class Read_API_Endpoints:
             return ele.format(enrollment_id)
         except Exception as ex:
             print(ex)
+
+    def integration_Test_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'integration_Test_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
