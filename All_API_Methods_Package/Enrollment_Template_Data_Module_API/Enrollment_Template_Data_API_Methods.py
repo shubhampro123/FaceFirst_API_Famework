@@ -226,7 +226,7 @@ class Enrollment_Template_Data_API_Methods:
 
 def get_all_enrollment_template_data_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_template_data_endpoint()}"
     query_param = {"pageNumber": 0, "batchSize": 10}
     response_str = requests.get(url, headers=headers, params=query_param)
@@ -241,7 +241,7 @@ def create_enrollment_template_data_request(case_id):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_enrollment_template_data_endpoint()}"
     request_body = {"id": case_id, "algVersion": data[1], "stale": data[2]}
     request_data = json.dumps(request_body)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
 
     response_str = requests.post(url, data=request_data, headers=headers)
     response_json = response_str.json()
@@ -259,7 +259,7 @@ def create_enrollment_template_data(row_no):
 def delete_enrollment_template_data_request(case_id):
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_enrollment_template_data_endpoint(case_id)}"
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     response_str = requests.delete(url, headers=headers)
     response_json = response_str.json()
     return response_str, response_json
@@ -267,7 +267,7 @@ def delete_enrollment_template_data_request(case_id):
 
 def get_enrollment_template_data_count_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_template_data_count_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -276,7 +276,7 @@ def get_enrollment_template_data_count_request():
 
 def get_enrollment_template_data_by_id_request(enrollment_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_template_data_by_id_endpoint(enrollment_id)}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
@@ -286,7 +286,7 @@ def get_enrollment_template_data_by_id_request(enrollment_id):
 def delete_enrollment_request(case_id):
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     params = {"caseId": case_id, "deleteAlerts": False}
     response_str = requests.delete(url, headers=headers, params=params)
     response_json = response_str.json()
@@ -300,7 +300,7 @@ def edit_enrollment_template_data_request(case_id):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_enrollment_template_data_endpoint(case_id)}"
     request_body = {"id": case_id, "algVersion": data[1], "stale": data[2]}
     request_data = json.dumps(request_body)
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
 
     response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()

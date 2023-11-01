@@ -437,8 +437,8 @@ def get_all_enrollment_group_request():
     print(url)
     response_str = requests.get(url, headers=headers)
     print(response_str)
-    # response_json = response_str.json()
-    return response_str
+    response_json = response_str.json()
+    return response_str, response_json
 
 
 def create_enrollment_group_request(row_no):

@@ -22,8 +22,9 @@ class Enrollment_Data_API_Methods:
         try:
             self.row = 2
             time_entry(self.row, "start_time", self.sheet_name)
+            token = login_token()
             # case_id = create_enrollment_request()[3]
-            case_id = get_case_id()
+            case_id = get_case_id(token)
             print(case_id)
             response_list = get_enrollment_data_by_enrollment_id_request(case_id)
             self.response = response_list[0]
@@ -118,7 +119,7 @@ class Enrollment_Data_API_Methods:
 
 def get_enrollment_data_by_enrollment_id_request(case_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_data_by_id_endpoint(case_id)}"
     print(url)
     response_str = requests.get(url, headers=headers)
@@ -128,7 +129,7 @@ def get_enrollment_data_by_enrollment_id_request(case_id):
 
 def get_enrollment_data_by_page_number_and_batch_size_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}" \
           f"{Read_API_Endpoints().get_enrollment_data_by_page_number_and_batch_size_request_endpoint()}"
     print(url)
@@ -143,7 +144,7 @@ def get_enrollment_data_by_page_number_and_batch_size_request():
 
 def get_enrollment_data_count_request():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_data_count_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
