@@ -458,7 +458,7 @@ def start_search_request():
     data = start_search_test_data(test_data_row)
     start_search = f"{data[0]}"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     request_data = {"regionId": get_region_id()}
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
@@ -474,18 +474,19 @@ def start_search_request():
 
 def fed_search_status_request(job_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().fed_search_status_endpoint(job_id)}"
     print(url)
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
     print(response_str)
+    print(response_json)
     return response_str, response_json
 
 
 def get_visitor_image_by_image_id(image_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_visitors_image_by_image_id_endpoint(image_id)}"
     print(url)
     response_str = requests.get(url, headers=headers)
@@ -509,7 +510,7 @@ def random_number():
 
 def get_region_id():
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
     response_str = requests.get(url, headers=headers)
     return response_str.json()["zoneInfo"]["zones"][1]["regionId"]
@@ -521,7 +522,7 @@ def identify_alien_federated_request():
     image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\Visitor.png"
     data = identify_alien_federated_test_data(test_data_row)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_identify_alien_federated()}"
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     request_data = {"EndAge": data[0], "MaxMatches": data[1], "StartAge": data[2], "IncludeMatrics": data[3]}
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
@@ -544,7 +545,7 @@ def identify_alien_federated_test_data(row_no):
 
 def delete_alien_federated_request(job_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_alien_federated_endpoint(job_id)}"
     print(url)
     response_str = requests.delete(url, headers=headers)
@@ -555,7 +556,7 @@ def delete_alien_federated_request(job_id):
 
 def get_alien_image_by_image_id(image_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_alien_image_endpoint(image_id)}"
     print(url)
     response_str = requests.get(url, headers=headers)
@@ -565,7 +566,7 @@ def get_alien_image_by_image_id(image_id):
 
 def get_identify_alien_federated_status(job_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_identify_alien_federated_status_endpoint(job_id)}"
     print(url)
     response_str = requests.get(url, headers=headers)
@@ -576,7 +577,7 @@ def get_identify_alien_federated_status(job_id):
 
 def get_query_alien_face_info(image_id):
     token = login_token()
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_query_alien_face_info_endpoint(image_id)}"
     print(url)
     response_str = requests.get(url, headers=headers)
@@ -592,7 +593,7 @@ def identify_cancel_federated_request():
     data = start_search_test_data(test_data_row)
     start_search = f"{data[0]}"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     request_data = {"regionId": get_region_id()}
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
@@ -611,7 +612,7 @@ def get_query_alien_federated_identification_log():
     token = login_token()
     result_deleted = False
     count = 20
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_query_alien_federated_identification_log_endpoint(result_deleted, count)}"
     print(url)
     response_str = requests.get(url, headers=headers)
@@ -628,7 +629,7 @@ def visitor_search_request():
     limit = data[1]
     sort_direction = data[2]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_visitor_search_endpoint(start, limit, sort_direction)}"
-    headers = {"Token": token, "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"startTime": data[3]}
     request_data = json.dumps(request_body)
     response_str = requests.post(url, headers=headers, data=request_data)
@@ -649,7 +650,7 @@ def get_verify_visitor_count_by_zone():
     test_data_row = 8
     token = login_token()
     data = verify_visitor_count_by_zone_test_data(test_data_row)
-    headers = {"Token": token}
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_visitor_count_by_zone_endpoint()}"
     print(url)
     query_param = {"AgeBucket": data[0], "Male": data[1], "Female": data[2], "White": data[3], "Black": data[4],
