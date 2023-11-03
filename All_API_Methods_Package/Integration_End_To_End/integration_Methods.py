@@ -3,19 +3,11 @@ from pathlib import Path
 
 import requests
 
-from API_Utilities.Api_Base import time_entry, response_validation, excel_result, API_Base_Utilities, login_token
-
-from All_API_Methods_Package.Enrollment_Group_Module_API.Enrollment_Group_API_Methods import \
-    create_enrollment_group_test_data
-from All_API_Methods_Package.Identify_and_Enroll_Module_API.Identify_Enroll_Module_API import get_C_group_Id, \
-    get_profile_id, create_enrollment_data, create_enrollment_request
-from All_API_Methods_Package.Notification_groups_Module_API.Notification_Groups_Methods import get_user_info, \
-    create_notification_groups_without_users_enrollment_group_zone_test_data, add_user_to_alert_group_test_data
-from All_API_Methods_Package.Region_Module_API.Region_methods import region_module_test_module, \
-    get_request_region_by_descendants
-from All_API_Methods_Package.User_Roles_Module_API.User_Role_Methods import create_user_role_request, \
-    user_role_test_data, random_number
-from All_API_Methods_Package.Users_Module_API.Users_API_Methods import users_test_data, select_region
+from API_Utilities.Api_Base import time_entry, excel_result, login_token, API_Base_Utilities, response_validation
+from All_API_Methods_Package.Identify_and_Enroll_Module_API.Identify_Enroll_Module_API import create_enrollment_data, \
+    get_C_group_Id, get_profile_id, select_region
+from All_API_Methods_Package.Notification_groups_Module_API.Notification_Groups_Methods import get_user_info
+from All_API_Methods_Package.Users_Module_API.Users_API_Methods import random_number
 from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
 from Config_Package.Excel_Config_Files import XLUtils
 from Config_Package.Excel_Config_Files.XLUtils import getRowCount
@@ -125,7 +117,7 @@ def user_request_for_create_user(row):
                  "zip": data[12], "email": data[13], "aemail": data[14], "hphone": data[15],
                  "wphone": data[16], "fphone": data[17], "aphone": data[18], "phone_type": data[19],
                  "provider": data[20], "timezone": data[21], "urole_id": user_role[4],
-                 "region_id": region_id[2], "username": f"{data[24]}{random_number()}", "password": data[25]}
+                 "region_id": data[23], "username": f"{data[24]}{random_number()}", "password": data[25]}
     response_str = requests.post(url, form_data, headers=headers)
     response_json = response_str.json()
     user_id = response_json["userId"]
@@ -251,5 +243,26 @@ def get_fed_search_status_request(job_id):
     matches = response_json["matched"]
     print(matches)
 
+
+def create_enrollment_request():
+    token = login_token()
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img2.png"
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
+    data = create_enrollment_data(2)
+    request_body = {"CgroupId": get_C_group_Id(), "OptOut": data[1], "Basis": data[2], "Action": data[3],
+                    "ActivityType": data[4], "BodyMarkings": data[5], "Build": data[6],
+                    "CaseEventType": data[7], "CaseNumber": data[8], "Enabled": data[9], "Gender": data[10],
+                    "HeightType": data[11], "MethodOffence": data[12], "NarrativeDesc": data[13],
+                    "ProfileId": get_profile_id(), "ReportedBy": data[15], "ReportedLoss": data[16],
+                    "StoreId": data[17], "TimeIncident": data[18], "RegionId": select_region()}
+
+    files = [
+        ('Image', ('img2.png', open(image_path, 'rb'), 'image/png'))
+    ]
+    headers = {"Authorization": f"Token {token}"}
+    response_str = requests.post(url, request_body, headers=headers, files=files)
+    response_json = response_str.json()
+    caseId = response_json["enroll"]["caseId"]
+    return request_body, response_str, response_json, caseId
 
 
