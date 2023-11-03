@@ -450,6 +450,82 @@ class Visitors_Search_API_Methods:
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
             return False
 
+    def verify_visitor_count_by_time(self):
+        result = []
+        try:
+            self.row = 14
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = get_verify_visitor_count_by_time()
+            self.response = response_list[0]
+            self.json_response = response_list[1]
+            print(self.json_response)
+            if response_validation(self.response):
+                excel_result(self.row, "Test_13", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time",
+                                                                              self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_13", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time",
+                                                                              self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            print(ex)
+            excel_result(self.row, "Test_13", self.r_body, self.json_response, self.response.status_code,
+                         self.act_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_visitor_search_Test_13:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def verify_delete_alien_faces(self):
+        result = []
+        try:
+            self.row = 15
+            time_entry(self.row, "start_time", self.sheet_name)
+            job_id = start_search_request()[3]
+            fed_search_resp = fed_search_status_request(job_id)[1]
+            track_id = fed_search_resp["matched"][0]["trackId"]
+            face_id = fed_search_resp["matched"][0]["id"]
+            response_list = delete_alien_faces_request(job_id, track_id, face_id)
+            self.response = response_list[0]
+            self.json_response = response_list[1]
+            print(self.json_response)
+            if response_validation(self.response):
+                excel_result(self.row, "Test_14", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time",
+                                                                              self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_14", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time",
+                                                                              self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            print(ex)
+            excel_result(self.row, "Test_14", self.r_body, self.json_response, self.response.status_code,
+                         self.act_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_visitor_search_Test_14:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
 
 def start_search_request():
     test_data_row = 2
@@ -669,4 +745,42 @@ def verify_visitor_count_by_zone_test_data(row_no):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
                                       Read_API_Endpoints().visitor_search_test_data_sheet_name(), row_no, x))
     return data
+
+
+def get_verify_visitor_count_by_time():
+    test_data_row = 10
+    token = login_token()
+    data = verify_visitor_count_by_time_test(test_data_row)
+    headers = {"Authorization": f"Token {token}"}
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_visitor_count_by_time_endpoint()}"
+    print(url)
+    query_param = {"Asian": data[0], "Black": data[1], "Male": data[2], "Female": data[3], "Indian": data[4],
+                   "White": data[5], "AgeBucket": data[6], "StartAge" : data[7], "EndAge": data[8],
+                   "UnknownEthnicity": data[9], "UnknownGender": data[10]
+                   }
+    response_str = requests.get(url, headers=headers, params=query_param)
+    response_json = response_str.json()
+    print(response_str)
+    return response_str, response_json
+
+
+def verify_visitor_count_by_time_test(row_no):
+    data = []
+    for x in range(3, 14):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().visitor_search_test_data_sheet_name(), row_no, x))
+    return data
+
+
+def delete_alien_faces_request(job_id, track_id, image_id):
+    token = login_token()
+    headers = {"Authorization": f"Token {token}"}
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_alien_faces_endpoint()}"
+    print(url)
+    query_param = {"faceId": image_id, "trackId": track_id, "deleteAlerts": False, "JobId": job_id
+                   }
+    response_str = requests.delete(url, headers=headers, params=query_param)
+    response_json = response_str.json()
+    print(response_str)
+    return response_str, response_json
 

@@ -89,3 +89,17 @@ class Test_visitors_search_api(API_Base_Utilities):
         else:
             assert False
 
+    def test_Visitors_Test_13(self):
+        self.logger.info("test_visitor_search_Test_13  : Execution Started >>")
+        if Visitors_Search_API_Methods(self.logger).verify_visitor_count_by_time():
+            assert True
+        else:
+            assert False
+
+    def test_Visitors_Test_14(self):
+        self.logger.info("test_visitor_search_Test_14  : Execution Started >>")
+        if Visitors_Search_API_Methods(self.logger).verify_delete_alien_faces():
+            assert True
+        else:
+            assert False
+

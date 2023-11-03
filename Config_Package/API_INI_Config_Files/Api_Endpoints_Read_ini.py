@@ -999,6 +999,13 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def delete_alien_faces_endpoint(self):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'delete_alien_faces_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def get_alien_image_endpoint(self, image_id):
         try:
             ele = self.config.get('VISITOR_SEARCH', 'get_alien_image_endpoint')
@@ -1044,6 +1051,13 @@ class Read_API_Endpoints:
     def get_visitor_count_by_zone_endpoint(self):
         try:
             ele = self.config.get('VISITOR_SEARCH', 'get_visitor_count_by_zone_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def get_visitor_count_by_time_endpoint(self):
+        try:
+            ele = self.config.get('VISITOR_SEARCH', 'get_visitor_count_by_time_endpoint')
             return ele
         except Exception as ex:
             print(ex)
