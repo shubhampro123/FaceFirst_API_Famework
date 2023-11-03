@@ -17,7 +17,21 @@ class Test_integration_api(API_Base_Utilities):
 
     def test_integration_Test_02(self):
         self.logger.info("test_integration_Test_02  : Execution Started >>")
-        if Integration_API_Methods(self.logger).second_integration_end_to_end():
+        if Integration_API_Methods(self.logger).second_integration_end_to_end_VS_with_pic():
+            assert True
+        else:
+            assert False
+
+    def test_integration_Test_03(self):
+        self.logger.info("test_integration_Test_03  : Execution Started >>")
+        if Integration_API_Methods(self.logger).third_integration_end_to_end_VS_with_pic_metadata():
+            assert True
+        else:
+            assert False
+
+    def test_integration_Test_04(self):
+        self.logger.info("test_integration_Test_04  : Execution Started >>")
+        if Integration_API_Methods(self.logger).fourth_integration_end_to_end_VS_with_only_metadata():
             assert True
         else:
             assert False
