@@ -50,16 +50,104 @@ class Integration_API_Methods:
             else:
                 return True
         except Exception as ex:
-            excel_result(self.row, self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+            excel_result(self.row, "Test_01",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
                          False, self.sheet_name)
             self.log.info(f"test_integration_Test_01_Exception:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
             return False
 
-    def second_integration_end_to_end(self):
-        job_id = start_search_request()[2]
-        get_fed_search_status_request(job_id)
-        create_enrollment_request()
+    def second_integration_end_to_end_VS_with_pic(self):
+        result = []
+        try:
+            self.row = 3
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = integration_end_to_end_VS_with_pic_request()
+            self.response = response_list[1]
+            if False not in response_list[0]:
+                excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
+                             False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_02",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_integration_Test_02_Exception:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def third_integration_end_to_end_VS_with_pic_metadata(self):
+        result = []
+        try:
+            self.row = 3
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = integration_end_to_end_VS_with_pic_meta_data_request()
+            self.response = response_list[1]
+            if False not in response_list[0]:
+                excel_result(self.row, "Test_03", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_03", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
+                             False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_03",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_integration_Test_03_Exception:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
+    def fourth_integration_end_to_end_VS_with_only_metadata(self):
+        result = []
+        try:
+            self.row = 3
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = integration_end_to_end_VS_with_only_meta_data_request()
+            self.response = response_list[1]
+            if False not in response_list[0]:
+                excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
+                             False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_04",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_integration_Test_04_Exception:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
 
 
 ####################################################################################################################
@@ -242,6 +330,7 @@ def get_fed_search_status_request(job_id):
     response_json = response_str.json()
     matches = response_json["matched"]
     print(matches)
+    return response_str
 
 
 def create_enrollment_request():
@@ -264,5 +353,109 @@ def create_enrollment_request():
     response_json = response_str.json()
     caseId = response_json["enroll"]["caseId"]
     return request_body, response_str, response_json, caseId
+
+
+def integration_end_to_end_VS_with_pic_request():
+    result = []
+    response_str = ""
+    row_count = getRowCount(API_Base_Utilities.test_data_excel_path,
+                            Read_API_Endpoints().integration_Test_data_sheet_name())
+    start_search_resp = start_search_request()
+    job_id = start_search_resp[2]
+    result.append(response_validation(start_search_resp[0]))
+    fed_search_resp = get_fed_search_status_request(job_id)
+    result.append(response_validation(fed_search_resp))
+    create_enroll_resp = create_enrollment_request()
+    result.append(response_validation(create_enroll_resp[1]))
+    response_str = create_enroll_resp[1]
+    return result, response_str
+
+
+def integration_end_to_end_VS_with_pic_meta_data_request():
+    result = []
+    response_str = ""
+    row_count = getRowCount(API_Base_Utilities.test_data_excel_path,
+                            Read_API_Endpoints().integration_Test_data_sheet_name())
+    start_search_resp = start_search_with_pic_metadata_request()
+    job_id = start_search_resp[2]
+    result.append(response_validation(start_search_resp[0]))
+    fed_search_resp = get_fed_search_status_request(job_id)
+    result.append(response_validation(fed_search_resp))
+    create_enroll_resp = create_enrollment_request()
+    result.append(response_validation(create_enroll_resp[1]))
+    response_str = create_enroll_resp[1]
+    return result, response_str
+
+
+def start_search_with_pic_metadata_request():
+    token = login_token()
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    region_id = get_user_info_request()
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
+    data = start_search_with_pic_metadata_data(2)
+    files = [
+        ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
+    ]
+    headers = {"Authorization": f"Token {token}"}
+    request_data = {"threshold": data[0], "limit": data[1], "StartDateTime": data[2],
+                    "EndDateTime": data[3], "StartAge": data[4], "EndAge": data[5],
+                    "IsMale": data[6],"regionId": data[7]}
+    response_str = requests.post(url, headers=headers, files=files, data=request_data)
+    response_json = response_str.json()
+    print(response_json)
+    job_id = response_json["jobId"]
+    # role_id = response_json["id"]
+    return response_str, response_json, job_id
+
+
+def start_search_with_pic_metadata_data(row_no):
+    data = []
+    for x in range(3, 11):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
+    return data
+
+
+def integration_end_to_end_VS_with_only_meta_data_request():
+    result = []
+    response_str = ""
+    row_count = getRowCount(API_Base_Utilities.test_data_excel_path,
+                            Read_API_Endpoints().integration_Test_data_sheet_name())
+    start_search_resp = start_search_with_only_metadata_request()
+    job_id = start_search_resp[2]
+    result.append(response_validation(start_search_resp[0]))
+    fed_search_resp = get_fed_search_status_request(job_id)
+    result.append(response_validation(fed_search_resp))
+    create_enroll_resp = create_enrollment_request()
+    result.append(response_validation(create_enroll_resp[1]))
+    response_str = create_enroll_resp[1]
+    return result, response_str
+
+
+def start_search_with_only_metadata_request():
+    token = login_token()
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    region_id = get_user_info_request()
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
+    data = start_search_with_only_metadata_data(3)
+    headers = {"Authorization": f"Token {token}"}
+    request_data = {"threshold": data[0], "limit": data[1], "StartDateTime": data[2],
+                    "EndDateTime": data[3], "StartAge": data[4], "EndAge": data[5],
+                    "IsMale": data[6],"regionId": data[7]}
+    response_str = requests.post(url, headers=headers, data=request_data)
+    response_json = response_str.json()
+    print(response_json)
+    job_id = response_json["jobId"]
+    # role_id = response_json["id"]
+    return response_str, response_json, job_id
+
+
+def start_search_with_only_metadata_data(row_no):
+    data = []
+    for x in range(3, 11):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
+    return data
+
 
 

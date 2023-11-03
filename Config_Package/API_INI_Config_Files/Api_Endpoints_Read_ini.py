@@ -1180,3 +1180,10 @@ class Read_API_Endpoints:
             return ele
         except Exception as ex:
             print(ex)
+
+    def integration_Test_with_metadata_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'integration_Test_with_metadata_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
