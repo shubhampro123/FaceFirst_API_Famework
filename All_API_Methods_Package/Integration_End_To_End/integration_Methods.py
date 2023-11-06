@@ -358,7 +358,7 @@ def create_enrollment_request(image_id):
     response_json = response.json()
     caseId = response_json.get("enroll", {}).get("caseId", None)
     print(response_json)
-    return request_body, response, response_json, caseId
+    return request_body, response, response_json, caseId, image
 
 
 def get_image_using_image_id(image_id):
@@ -373,8 +373,6 @@ def get_image_using_image_id(image_id):
 def integration_end_to_end_VS_with_pic_request():
     result = []
     response_str = ""
-    row_count = getRowCount(API_Base_Utilities.test_data_excel_path,
-                            Read_API_Endpoints().integration_Test_data_sheet_name())
     start_search_resp = start_search_request()
     job_id = start_search_resp[2]
     result.append(response_validation(start_search_resp[0]))
@@ -387,14 +385,83 @@ def integration_end_to_end_VS_with_pic_request():
         create_enroll_resp = create_enrollment_request(image_id[x])
         result.append(response_validation(create_enroll_resp[1]))
         response_str = create_enroll_resp[1]
+        case_id = create_enroll_resp[3]
+        add_notes_resp = add_notes_to_enrollment_request(case_id, create_enroll_resp[4])
+        result.append(response_validation(add_notes_resp[1]))
+
+    identify_enrollment_index_resp = identify_enrollment_index()
+    result.append(identify_enrollment_index_resp[0])
+    result.append(identify_enrollment_index_resp[2])
     return result, response_str
+
+
+def add_notes_to_enrollment_request(case_id, image):
+    token = login_token()
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_notes_endpoint()}"
+    data = create_notes_data(2)
+    request_body = {"gender": data[0], "build": data[1], "bodyMarkings": data[2], "narrativeDesc": data[3],
+                    "action": data[4], "storeId": data[5], "caseNumber": data[6],
+                    "timeIncident": data[7], "reportedBy": data[8], "reportedLoss": data[9],
+                    "caseEventType": data[10],
+                    "activityType": data[11], "heightType": data[12], "methodOffence": data[13],
+                    "ProfileId": data[14], "CaseId": case_id, "SetCases": data[16],
+                    }
+
+    # image = get_image_using_image_id(image_id)
+    files = [
+        ('Image', ('image.jpg', image.content, 'image/jpeg'))
+    ]
+    headers = {"Authorization": f"Token {token}"}
+    response_str = requests.post(url, headers=headers, data=request_body,  files=files)
+    response_json = response_str.json()
+    return request_body, response_str, response_json
+
+
+def identify_enrollment_index():
+    token = login_token()
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    headers = {"Authorization": f"Token {token}"}
+    data = identify_enrollment_data(6)
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().identify_enrollment_endpoint()}"
+    request_body = {"DetailLevel": data[0], "MaxMatches": data[1], "IncludeMatrics": data[2]}
+    files = [
+        ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
+    ]
+    response_str = requests.post(url, data=request_body, headers=headers, files=files)
+    response_json = response_str.json()
+    print(response_json)
+    matches = response_json["id"]["matches"]
+    print(matches)
+    index = []
+    for x in range(0, len(matches)):
+        print(matches[x]["score"])
+        index.append(matches[x]["score"] is not "")
+    index_result = False
+    if False not in index:
+        index_result = True
+    return response_str, response_json, index_result
+
+
+def identify_enrollment_data(row_no):
+    data = []
+    for x in range(3, 6):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().identify_enroll_test_data_sheet_name(), row_no, x))
+    return data
+
+
+def create_notes_data(row_no):
+    data = []
+    for x in range(12, 29):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
+    return data
 
 
 def integration_end_to_end_VS_with_pic_meta_data_request():
     result = []
     response_str = ""
-    row_count = getRowCount(API_Base_Utilities.test_data_excel_path,
-                            Read_API_Endpoints().integration_Test_data_sheet_name())
     start_search_resp = start_search_with_pic_metadata_request()
     job_id = start_search_resp[2]
     result.append(response_validation(start_search_resp[0]))
@@ -406,6 +473,13 @@ def integration_end_to_end_VS_with_pic_meta_data_request():
         create_enroll_resp = create_enrollment_request(image_id[x])
         result.append(response_validation(create_enroll_resp[1]))
         response_str = create_enroll_resp[1]
+        case_id = create_enroll_resp[3]
+        add_notes_resp = add_notes_to_enrollment_request(case_id, create_enroll_resp[4])
+        result.append(response_validation(add_notes_resp[1]))
+
+    identify_enrollment_index_resp = identify_enrollment_index_visitor_search_with_pic()
+    result.append(identify_enrollment_index_resp[0])
+    result.append(identify_enrollment_index_resp[2])
     return result, response_str
 
 
@@ -478,3 +552,29 @@ def start_search_with_only_metadata_data(row_no):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
                                       Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
     return data
+
+
+def identify_enrollment_index_visitor_search_with_pic():
+    token = login_token()
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    headers = {"Authorization": f"Token {token}"}
+    data = identify_enrollment_data(6)
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().identify_enrollment_endpoint()}"
+    request_body = {"DetailLevel": data[0], "MaxMatches": data[1], "IncludeMatrics": data[2]}
+    files = [
+        ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
+    ]
+    response_str = requests.post(url, data=request_body, headers=headers, files=files)
+    response_json = response_str.json()
+    print(response_json)
+    matches = response_json["id"]["matches"]
+    print(matches)
+    index = []
+    for x in range(0, len(matches)):
+        print(matches[x]["score"])
+        index.append(matches[x]["score"] is not "")
+    index_result = False
+    if False not in index:
+        index_result = True
+    return response_str, response_json, index_result
+
