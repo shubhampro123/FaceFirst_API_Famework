@@ -374,5 +374,5 @@ def user_role_test_data(row_no):
 
 
 def random_number():
-    r_number = random.randint(1, 1000)
+    r_number = random.randint(1, 1000000)
     return r_number

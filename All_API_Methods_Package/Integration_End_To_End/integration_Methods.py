@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 
 import requests
@@ -50,7 +51,7 @@ class Integration_API_Methods:
             else:
                 return True
         except Exception as ex:
-            excel_result(self.row, "Test_01",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+            excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
                          False, self.sheet_name)
             self.log.info(f"test_integration_Test_01_Exception:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
@@ -81,7 +82,7 @@ class Integration_API_Methods:
             else:
                 return True
         except Exception as ex:
-            excel_result(self.row, "Test_02",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+            excel_result(self.row, "Test_02", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
                          False, self.sheet_name)
             self.log.info(f"test_integration_Test_02_Exception:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
@@ -112,7 +113,7 @@ class Integration_API_Methods:
             else:
                 return True
         except Exception as ex:
-            excel_result(self.row, "Test_03",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+            excel_result(self.row, "Test_03", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
                          False, self.sheet_name)
             self.log.info(f"test_integration_Test_03_Exception:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
@@ -143,7 +144,7 @@ class Integration_API_Methods:
             else:
                 return True
         except Exception as ex:
-            excel_result(self.row, "Test_04",self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+            excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
                          False, self.sheet_name)
             self.log.info(f"test_integration_Test_04_Exception:  {ex}")
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
@@ -304,11 +305,11 @@ def get_data(row_no, start_column, end_column):
 
 def start_search_request():
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
     region_id = get_user_info_request()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
     files = [
-        ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
+        ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": 0.25, "regionId": region_id[2]}
@@ -326,16 +327,19 @@ def get_fed_search_status_request(job_id):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().fed_search_status_endpoint(job_id)}"
     print(url)
     response_str = requests.get(url, params=params, headers=headers)
+    time.sleep(3)
     print(response_str)
     response_json = response_str.json()
-    matches = response_json["matched"]
-    print(matches)
-    return response_str
+    image_id = []
+    for x in range(0, 5):
+        time.sleep(1)
+        image_id.append(response_json["matched"][x]["id"])
+    return response_str, image_id
 
 
-def create_enrollment_request():
+def create_enrollment_request(image_id):
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img2.png"
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img2.png"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
     data = create_enrollment_data(2)
     request_body = {"CgroupId": get_C_group_Id(), "OptOut": data[1], "Basis": data[2], "Action": data[3],
@@ -345,14 +349,25 @@ def create_enrollment_request():
                     "ProfileId": get_profile_id(), "ReportedBy": data[15], "ReportedLoss": data[16],
                     "StoreId": data[17], "TimeIncident": data[18], "RegionId": select_region()}
 
+    image = get_image_using_image_id(image_id)
     files = [
-        ('Image', ('img2.png', open(image_path, 'rb'), 'image/png'))
+        ('Image', ('image.jpg', image.content, 'image/jpeg'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, request_body, headers=headers, files=files)
-    response_json = response_str.json()
-    caseId = response_json["enroll"]["caseId"]
-    return request_body, response_str, response_json, caseId
+    response = requests.post(url, headers=headers, data=request_body,  files=files)
+    response_json = response.json()
+    caseId = response_json.get("enroll", {}).get("caseId", None)
+    print(response_json)
+    return request_body, response, response_json, caseId
+
+
+def get_image_using_image_id(image_id):
+    token = login_token()
+    url = f"https://ff-india-qa10.eastus2.cloudapp.azure.com/api/media/{image_id}/visitor?use_thumbnail=1&blur_images=0"
+    headers = {"Authorization": f"Token {token}"}
+    response = requests.get(url, headers=headers)
+    print(response.content)
+    return response
 
 
 def integration_end_to_end_VS_with_pic_request():
@@ -364,10 +379,14 @@ def integration_end_to_end_VS_with_pic_request():
     job_id = start_search_resp[2]
     result.append(response_validation(start_search_resp[0]))
     fed_search_resp = get_fed_search_status_request(job_id)
-    result.append(response_validation(fed_search_resp))
-    create_enroll_resp = create_enrollment_request()
-    result.append(response_validation(create_enroll_resp[1]))
-    response_str = create_enroll_resp[1]
+    image_id = fed_search_resp[1]
+    print(image_id)
+    result.append(response_validation(fed_search_resp[0]))
+    for x in range(0, len(image_id)):
+        time.sleep(2)
+        create_enroll_resp = create_enrollment_request(image_id[x])
+        result.append(response_validation(create_enroll_resp[1]))
+        response_str = create_enroll_resp[1]
     return result, response_str
 
 
@@ -380,10 +399,13 @@ def integration_end_to_end_VS_with_pic_meta_data_request():
     job_id = start_search_resp[2]
     result.append(response_validation(start_search_resp[0]))
     fed_search_resp = get_fed_search_status_request(job_id)
-    result.append(response_validation(fed_search_resp))
-    create_enroll_resp = create_enrollment_request()
-    result.append(response_validation(create_enroll_resp[1]))
-    response_str = create_enroll_resp[1]
+    image_id = fed_search_resp[1]
+    result.append(response_validation(fed_search_resp[0]))
+    for x in range(0, len(image_id)):
+        time.sleep(2)
+        create_enroll_resp = create_enrollment_request(image_id[x])
+        result.append(response_validation(create_enroll_resp[1]))
+        response_str = create_enroll_resp[1]
     return result, response_str
 
 
@@ -399,7 +421,7 @@ def start_search_with_pic_metadata_request():
     headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": data[0], "limit": data[1], "StartDateTime": data[2],
                     "EndDateTime": data[3], "StartAge": data[4], "EndAge": data[5],
-                    "IsMale": data[6],"regionId": data[7]}
+                    "IsMale": data[6], "regionId": data[7]}
     response_str = requests.post(url, headers=headers, files=files, data=request_data)
     response_json = response_str.json()
     print(response_json)
@@ -441,7 +463,7 @@ def start_search_with_only_metadata_request():
     headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": data[0], "limit": data[1], "StartDateTime": data[2],
                     "EndDateTime": data[3], "StartAge": data[4], "EndAge": data[5],
-                    "IsMale": data[6],"regionId": data[7]}
+                    "IsMale": data[6], "regionId": data[7]}
     response_str = requests.post(url, headers=headers, data=request_data)
     response_json = response_str.json()
     print(response_json)
@@ -456,6 +478,3 @@ def start_search_with_only_metadata_data(row_no):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
                                       Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
     return data
-
-
-

@@ -464,6 +464,7 @@ def create_enrollment_request():
     response_str = requests.post(url, request_body, headers=headers, files=files)
     response_json = response_str.json()
     caseId = response_json["enroll"]["caseId"]
+    print(response_json)
     return request_body, response_str, response_json, caseId
 
 
@@ -472,14 +473,16 @@ def create_enrollment_with_image():
     caseId = enroll[3]
     token = login_token()
     params = {"caseId": caseId}
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img2.png"
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().add_enrollment_with_image_end_point()}"
     files = [
-        ('Image', ('image.png', open(image_path, 'rb'), 'img2/png'))
+        ('Image', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
     response_str = requests.post(url, params=params, headers=headers, files=files)
     response_json = response_str.json()
+    print(response_json)
+    print(response_str)
     return response_str, response_json
 
 
@@ -503,6 +506,7 @@ def remove_enrollment_images_request():
     request_data = json.dumps(request_body)
     response_str = requests.put(url, data=request_data, headers=headers)
     response_json = response_str.json()
+    print(response_json)
     return request_body, response_str, response_json
 
 
