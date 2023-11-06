@@ -355,6 +355,14 @@ def create_enrollment_request():
     return request_body, response_str, response_json, caseId
 
 
+def get_image_using_image_id():
+    token = login_token()
+    url = "https://ff-india-qa10.eastus2.cloudapp.azure.com/api/media/bc47ae96-08f9-428c-a264-8e332cbd97d5/visitor"
+    headers = {"Authorization": f"Token {token}"}
+    response = requests.get(url, headers=headers)
+    return response
+
+
 def integration_end_to_end_VS_with_pic_request():
     result = []
     response_str = ""
@@ -366,8 +374,12 @@ def integration_end_to_end_VS_with_pic_request():
     fed_search_resp = get_fed_search_status_request(job_id)
     result.append(response_validation(fed_search_resp))
     create_enroll_resp = create_enrollment_request()
+    case_id = create_enroll_resp[3]
     result.append(response_validation(create_enroll_resp[1]))
     response_str = create_enroll_resp[1]
+
+    # Add note to enrollmnet
+    add_notes_to_enrollment_request(case_id)
     return result, response_str
 
 
@@ -457,5 +469,34 @@ def start_search_with_only_metadata_data(row_no):
                                       Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
     return data
 
+
+def add_notes_to_enrollment_request(case_id):
+    token = login_token()
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_notes_endpoint()}"
+    data = create_notes_data(2)
+    request_body = {"gender": data[0], "build": data[1], "bodyMarkings": data[2], "narrativeDesc": data[3],
+                    "action": data[4], "storeId": data[5], "caseNumber": data[6],
+                    "timeIncident": data[7], "reportedBy": data[8], "reportedLoss": data[9],
+                    "caseEventType": data[10],
+                    "activityType": data[11], "heightType": data[12], "methodOffence": data[13],
+                    "ProfileId": data[14], "CaseId": case_id, "SetCases": data[16],
+                    }
+
+    files = [
+        ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
+    ]
+    headers = {"Authorization": f"Token {token}"}
+    response_str = requests.post(url, request_body, headers=headers, files=files)
+    response_json = response_str.json()
+    return request_body, response_str, response_json
+
+
+def create_notes_data(row_no):
+    data = []
+    for x in range(12, 29):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
+    return data
 
 
