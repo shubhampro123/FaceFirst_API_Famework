@@ -522,9 +522,11 @@ def get_create_regions_migrate_events():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     zone_id = get_all_zones()
+    print(zone_id)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_by_migrate_events(zone_id[0])}"
     response_str = requests.post(url, zone_id[0], headers=headers)
     response_json = response_str.json()
+    print(response_json)
     # act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
     return response_str, response_json
 
@@ -536,7 +538,7 @@ def get_all_zones():
     query_params = {"offset": 0}
     response_str = requests.get(url, params=query_params, headers=headers)
     response_json = response_str.json()
-    data = response_json["zoneInfo"]["zones"][1]["zoneId"]
+    data = response_json["zoneInfo"]["zones"][3]["regionId"]
     account_id = response_json["zoneInfo"]["zones"][1]["accountId"]
     return data, account_id
 

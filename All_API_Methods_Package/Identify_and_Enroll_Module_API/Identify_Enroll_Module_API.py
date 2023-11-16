@@ -1,4 +1,6 @@
 import json
+import random
+import time
 from pathlib import Path
 
 import requests
@@ -461,28 +463,33 @@ def create_enrollment_request():
         ('Image', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
+    print(request_body)
     response_str = requests.post(url, request_body, headers=headers, files=files)
     response_json = response_str.json()
     caseId = response_json["enroll"]["caseId"]
-    print(response_json)
     return request_body, response_str, response_json, caseId
 
 
 def create_enrollment_with_image():
-    enroll = create_enrollment_request()
-    caseId = enroll[3]
+    enroll = search_enrollment_request()[2]
+    caseId = ""
+    # random_index = random.randint(0, len(enroll["caseInfo"]["cases"]) - 1)
+    # caseId = enroll["caseInfo"]["cases"][random_index]["caseId"]
+    for x in range(0, len(enroll["caseInfo"]["cases"])):
+        if x == len(enroll["caseInfo"]["cases"]) - 1:
+            caseId = enroll["caseInfo"]["cases"][x]["caseId"]
+    print(caseId)
     token = login_token()
     params = {"caseId": caseId}
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().add_enrollment_with_image_end_point()}"
     files = [
-        ('Image', ('image.png', open(image_path, 'rb'), 'image/png'))
+        ('Image', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
     response_str = requests.post(url, params=params, headers=headers, files=files)
     response_json = response_str.json()
     print(response_json)
-    print(response_str)
     return response_str, response_json
 
 
@@ -573,7 +580,7 @@ def clear_enrollment_info_request():
 
 
 def search_enrollment_request():
-    create_enrollment_request()
+    # create_enrollment_request()
     token = login_token()
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     url = f"{API_Base_Utilities.Base_URL}api/Enrollments/searchEnrollments"

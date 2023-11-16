@@ -217,7 +217,7 @@ class Read_API_Endpoints:
 
     def events_search_endpoint(self):
         try:
-            ele = self.config.get('All_Module_Search_API', 'events_search_endpoint')
+            ele = self.config.get('M_All_Module_Search_API', 'events_search_endpoint')
             return ele
         except Exception as ex:
             print(ex)
@@ -439,14 +439,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_alert_group_using_ID(self,a_group_id):
+    def get_alert_group_using_ID(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'get_alert_group_using_ID')
             return ele.format(a_group_id)
         except Exception as ex:
             print(ex)
 
-    def put_alert_group_ID(self,a_group_id):
+    def put_alert_group_ID(self, a_group_id):
         try:
             ele = self.config.get('NOTIFICATION_GROUPS', 'put_alert_group_ID')
             return ele.format(a_group_id)
@@ -502,7 +502,7 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_zone_by_id_endpoint(self,zone_id):
+    def get_zone_by_id_endpoint(self, zone_id):
         try:
             ele = self.config.get('ZONES', 'get_zone_by_id_endpoint')
             return ele.format(zone_id)
@@ -530,14 +530,14 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_account_by_account_id_endpoint(self,account_id):
+    def get_account_by_account_id_endpoint(self, account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_by_account_id_endpoint')
             return ele.format(account_id)
         except Exception as ex:
             print(ex)
 
-    def get_account_stations_by_account_id_endpoint(self,account_id):
+    def get_account_stations_by_account_id_endpoint(self, account_id):
         try:
             ele = self.config.get('ACCOUNT', 'get_account_stations_by_account_id_endpoint')
             return ele.format(account_id)
@@ -915,6 +915,20 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def approve_integration_Test_Data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'approve_integration_Test_Data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def approve_create_enrollment_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'approve_create_enrollment_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def visitors_search_end_point(self):
         try:
             ele = self.config.get('VISITOR_SEARCH', 'visitors_search_end_point')
@@ -1071,7 +1085,8 @@ class Read_API_Endpoints:
 
     def get_enrollment_data_by_page_number_and_batch_size_request_endpoint(self):
         try:
-            ele = self.config.get('ENROLLMENT_DATA', 'get_enrollment_data_by_page_number_and_batch_size_request_endpoint')
+            ele = self.config.get('ENROLLMENT_DATA',
+                                  'get_enrollment_data_by_page_number_and_batch_size_request_endpoint')
             return ele
         except Exception as ex:
             print(ex)
@@ -1106,7 +1121,8 @@ class Read_API_Endpoints:
 
     def get_enrollment_group_data_by_page_number_and_batch_size_endpoint(self):
         try:
-            ele = self.config.get('ENROLLMENT_GROUP_DATA', 'get_enrollment_group_data_by_page_number_and_batch_size_endpoint')
+            ele = self.config.get('ENROLLMENT_GROUP_DATA',
+                                  'get_enrollment_group_data_by_page_number_and_batch_size_endpoint')
             return ele
         except Exception as ex:
             print(ex)
@@ -1184,6 +1200,13 @@ class Read_API_Endpoints:
     def integration_Test_with_metadata_data_sheet_name(self):
         try:
             ele = self.config.get('TEST_DATA_SHEET_NAME', 'integration_Test_with_metadata_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def disable_approve_enrollment_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'disable_approve_enrollment_data_sheet_name')
             return ele
         except Exception as ex:
             print(ex)
