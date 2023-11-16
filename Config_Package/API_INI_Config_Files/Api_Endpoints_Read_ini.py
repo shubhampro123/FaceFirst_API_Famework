@@ -1187,3 +1187,10 @@ class Read_API_Endpoints:
             return ele
         except Exception as ex:
             print(ex)
+
+    def post_tag_alerts_endpoint(self):
+        try:
+            ele = self.config.get('TAGS', 'post_tag_alerts_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
