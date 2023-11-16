@@ -251,7 +251,7 @@ def create_enrollment_group_request(row):
     return request_body, response_str, response_json, data
 
 
-def add_user_to_alert_group_request(row, group_id):
+def add_user_to_alert_group_VS_request(row, group_id):
     result = []
 
     # create user role and link the user role to user
@@ -273,7 +273,7 @@ def add_user_to_alert_group_request(row, group_id):
     return request_body, response_str, response_json, result
 
 
-def add_enrollment_to_alert_group_request(row):
+def add_enrollment_to_alert_group_VS_request(row):
     token = login_token()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_enrollment_group_to_alert_group()}"
 
@@ -299,8 +299,8 @@ def integration_end_to_end_request():
                             Read_API_Endpoints().integration_Test_data_sheet_name())
     for x in range(2, row_count + 1):
         row = x
-        data = add_enrollment_to_alert_group_request(row)[3]
-        response = add_user_to_alert_group_request(row, data)
+        data = add_enrollment_to_alert_group_VS_request(row)[3]
+        response = add_user_to_alert_group_VS_request(row, data)
         result.append(response[3])
         response_str = response[1]
     return result, response_str
@@ -314,11 +314,11 @@ def integration_user_role_user_enrollment_group_notification_group_creation_requ
                             Read_API_Endpoints().integration_Test_data_sheet_name())
     for x in range(2, row_count + 1):
         row = x
-        data = add_enrollment_to_alert_group_request(row)
+        data = add_enrollment_to_alert_group_VS_request(row)
         alert_id = data[3]
         c_group_id = data[4]
         c_group_ids.append(c_group_id)
-        response = add_user_to_alert_group_request(row, alert_id)
+        response = add_user_to_alert_group_VS_request(row, alert_id)
         result.append(response[3])
         response_str = response[1]
     return result, response_str, c_group_ids
