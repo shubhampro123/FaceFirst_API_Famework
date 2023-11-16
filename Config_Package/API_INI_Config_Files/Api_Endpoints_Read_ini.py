@@ -1134,62 +1134,6 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
-    def get_all_enrollment_template_data_endpoint(self):
-        try:
-            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'get_all_enrollment_template_data_endpoint')
-            return ele.format()
-        except Exception as ex:
-            print(ex)
-
-    def enrollment_template_data_test_data_sheet_name(self):
-        try:
-            ele = self.config.get('TEST_DATA_SHEET_NAME', 'enrollment_template_data_test_data_sheet_name')
-            return ele.format()
-        except Exception as ex:
-            print(ex)
-
-    def enrollment_template_data_test_results_sheet_name(self):
-        try:
-            ele = self.config.get('TEST_RESULT_SHEET_NAME', 'enrollment_template_data_test_results_sheet_name')
-            return ele.format()
-        except Exception as ex:
-            print(ex)
-
-    def post_enrollment_template_data_endpoint(self):
-        try:
-            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'post_enrollment_template_data_endpoint')
-            return ele.format()
-        except Exception as ex:
-            print(ex)
-
-    def delete_enrollment_template_data_endpoint(self, case_id):
-        try:
-            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'delete_enrollment_template_data_endpoint')
-            return ele.format(case_id)
-        except Exception as ex:
-            print(ex)
-
-    def get_enrollment_template_data_count_endpoint(self):
-        try:
-            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'get_enrollment_template_data_count_endpoint')
-            return ele
-        except Exception as ex:
-            print(ex)
-
-    def get_enrollment_template_data_by_id_endpoint(self, enrollment_id):
-        try:
-            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'get_enrollment_template_data_by_id_endpoint')
-            return ele.format(enrollment_id)
-        except Exception as ex:
-            print(ex)
-
-    def put_enrollment_template_data_endpoint(self, enrollment_id):
-        try:
-            ele = self.config.get('ENROLLMENT_TEMPLATE_DATA', 'put_enrollment_template_data_endpoint')
-            return ele.format(enrollment_id)
-        except Exception as ex:
-            print(ex)
-
     def integration_Test_data_sheet_name(self):
         try:
             ele = self.config.get('TEST_DATA_SHEET_NAME', 'integration_Test_data_sheet_name')
