@@ -241,7 +241,7 @@ def create_user_role_request(row_no):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().user_role_endpoint()}"
     data = user_role_test_data(row_no)
     role_name = f"{data[0]}{random_number()}"
-    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
+    headers = {"Authorization": f"{token}", "Content-Type": "application/json"}
     request_data = {"rolename": role_name, "enabled": data[1], "description": data[2],
                     "permissions": {"user": data[3], "alert": data[4], "alertGroup": data[5], "station": data[6],
                                     "blob": data[7],

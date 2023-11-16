@@ -28,8 +28,7 @@ class Enrollment_Group_API_Methods:
             self.row = 2
             time_entry(self.row, "start_time", self.sheet_name)
             response_list = get_all_enrollment_group_request()
-            self.response = response_list
-            print(response_validation(self.response))
+            self.response = response_list[0]
             if response_validation(self.response):
                 excel_result(self.row, "Test_01", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg,
@@ -438,6 +437,7 @@ def get_all_enrollment_group_request():
     response_str = requests.get(url, headers=headers)
     print(response_str)
     response_json = response_str.json()
+    print(response_json)
     return response_str, response_json
 
 

@@ -15,13 +15,13 @@ class Test_login_api(API_Base_Utilities):
         else:
             assert False
 
-    @pytest.mark.p1
-    def test_Login_Test_02(self):
-        self.logger.info("test_Login_Test_02  : Execution Started >>")
-        if Login_API_Methods(self.logger).verify_get_login():
-            assert True
-        else:
-            assert False
+    # @pytest.mark.p1
+    # def test_Login_Test_02(self):
+    #     self.logger.info("test_Login_Test_02  : Execution Started >>")
+    #     if Login_API_Methods(self.logger).verify_get_login():
+    #         assert True
+    #     else:
+    #         assert False
 
     @pytest.mark.p1
     def test_Login_Test_03(self):

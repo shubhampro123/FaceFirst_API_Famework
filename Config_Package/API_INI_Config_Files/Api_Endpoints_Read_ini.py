@@ -915,6 +915,20 @@ class Read_API_Endpoints:
         except Exception as ex:
             print(ex)
 
+    def approve_integration_Test_Data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'approve_integration_Test_Data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def approve_create_enrollment_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'approve_create_enrollment_data_sheet_name')
+            return ele
+        except Exception as ex:
+            print(ex)
+
     def visitors_search_end_point(self):
         try:
             ele = self.config.get('VISITOR_SEARCH', 'visitors_search_end_point')
@@ -1071,7 +1085,8 @@ class Read_API_Endpoints:
 
     def get_enrollment_data_by_page_number_and_batch_size_request_endpoint(self):
         try:
-            ele = self.config.get('ENROLLMENT_DATA', 'get_enrollment_data_by_page_number_and_batch_size_request_endpoint')
+            ele = self.config.get('ENROLLMENT_DATA',
+                                  'get_enrollment_data_by_page_number_and_batch_size_request_endpoint')
             return ele
         except Exception as ex:
             print(ex)
@@ -1106,7 +1121,8 @@ class Read_API_Endpoints:
 
     def get_enrollment_group_data_by_page_number_and_batch_size_endpoint(self):
         try:
-            ele = self.config.get('ENROLLMENT_GROUP_DATA', 'get_enrollment_group_data_by_page_number_and_batch_size_endpoint')
+            ele = self.config.get('ENROLLMENT_GROUP_DATA',
+                                  'get_enrollment_group_data_by_page_number_and_batch_size_endpoint')
             return ele
         except Exception as ex:
             print(ex)
@@ -1191,6 +1207,13 @@ class Read_API_Endpoints:
     def post_tag_alerts_endpoint(self):
         try:
             ele = self.config.get('TAGS', 'post_tag_alerts_endpoint')
+            return ele
+        except Exception as ex:
+            print(ex)
+
+    def disable_approve_enrollment_data_sheet_name(self):
+        try:
+            ele = self.config.get('TEST_DATA_SHEET_NAME', 'disable_approve_enrollment_data_sheet_name')
             return ele
         except Exception as ex:
             print(ex)
