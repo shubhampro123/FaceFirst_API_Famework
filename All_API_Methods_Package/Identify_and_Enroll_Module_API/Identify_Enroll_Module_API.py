@@ -640,7 +640,7 @@ def get_profile_id():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_profile_endpoint()}"
     response_str = requests.get(url, headers=headers)
     response_json = response_str.json()
-    return response_json["profiles"][0]["profileId"]
+    return response_json["profiles"][0]["profileID"]
 
 
 def select_region():
