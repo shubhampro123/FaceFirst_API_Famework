@@ -434,7 +434,7 @@ def get_all_enrollment_group_request():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_group_endpoint()}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     print(response_str)
     response_json = response_str.json()
     print(response_json)
@@ -451,7 +451,7 @@ def create_enrollment_group_request(row_no):
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
                     "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     data = response_json["data"]
@@ -469,7 +469,7 @@ def create_enrollment_group_with_addCaseGroupZone_request():
     account_id = zones_data[1]
     request_body = {"cGroupId": cGroupId, "zoneIds": [zoneIds]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return request_body, response_str, response_json, account_id, cGroupId
@@ -485,7 +485,7 @@ def create_enrollment_group_with_verify_addCaseGroupCase_request():
     account_id = zones_data[1]
     request_body = {"id": [account_id], "case_id": get_case_id(token), "cgroup_id": cGroupId}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, account_id, cGroupId
 
@@ -501,7 +501,7 @@ def remove_enrollment_group_with_removeCaseGroupZone_request():
     account_id = zones_data[1]
     request_body = {"cGroupId": cGroupId, "zoneIds": [zoneIds]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, account_id, cGroupId
 
@@ -516,7 +516,7 @@ def remove_enrollment_group_with_removeCaseGroupCase_request():
     account_id = zones_data[1]
     request_body = {"id": [account_id], "case_id": get_case_id(token), "cgroup_id": cGroupId}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, account_id, cGroupId
 
@@ -533,7 +533,7 @@ def remove_enrollment_group_with_addAlertGroupCase_request():
     request_body = {"CGroupID": cGroupId, "AGroupID": aGroupId}
     request_data = json.dumps(request_body)
     print(request_data)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return request_body, response_str, response_json, aGroupId, cGroupId
@@ -549,7 +549,7 @@ def remove_enrollment_group_with_removeAlertGroupCase_request():
     request_body = {"CGroupID": cGroupId, "AGroupID": aGroupId}
     request_data = json.dumps(request_body)
     print(request_data)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return request_body, response_str, response_json, aGroupId, cGroupId
@@ -558,16 +558,26 @@ def remove_enrollment_group_with_removeAlertGroupCase_request():
 def update_enrollment_group_request(row_no):
     token = login_token()
     res = create_enrollment_group_request(3)
+    print(res[3])
     group_id = res[3]
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     data = update_enrollment_group_test_data(row_no)
+    name = f"{data[0]}{random_number()}"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().update_enrollment_group_endpoint()}/{group_id}"
-    request_body = {"name": data[0], "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
-                    "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
-                    "alertHexColor": data[7], "activeThreat": data[8]}
+    print(url)
+    # request_body = {"name": data[0], "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
+    #                 "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
+    #                 "alertHexColor": data[7], "activeThreat": data[8]}
+
+    request_body = {"name":name,"description": data[1],"faceThreshold":data[2],
+                    "maskedFaceThreshold":data[3],"eventsSuppressionInterval":data[4],"priority":data[5],
+                    "seriousOffender":data[6],"alertHexColor":data[7],"activeThreat":data[8]}
+
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    print(request_data)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
+    print(response_json)
     return request_body, response_str, response_json, group_id
 
 
@@ -577,7 +587,7 @@ def delete_enrollment_group():
     group_id = res[3]
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_enrollment_group_endpoint()}/{group_id}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json, group_id
 
@@ -588,7 +598,7 @@ def get_enrollment_group_by_id():
     data = create_enrollment_group_request(3)
     form_data = {"id": data[3]}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_group_endpoint()}"
-    response_str = requests.get(url, params=form_data, headers=headers)
+    response_str = requests.get(url, params=form_data, headers=headers, verify=False)
     response_json = response_str.json()
     return form_data, response_str, response_json
 
@@ -614,7 +624,7 @@ def get_all_zones():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
     query_params = {"offset": 0}
-    response_str = requests.get(url, params=query_params, headers=headers)
+    response_str = requests.get(url, params=query_params, headers=headers, verify=False)
     response_json = response_str.json()
     data = response_json["zoneInfo"]["zones"][1]["zoneId"]
     account_id = response_json["zoneInfo"]["zones"][1]["accountId"]
@@ -626,7 +636,7 @@ def get_case_id(token):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_endpoint()}"
     request_body = {"DetailLevel": 3, "Offset": 0, "count": 20, "Ascending": 0, "IsExact": False}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, headers=headers, data=request_data)
+    response_str = requests.post(url, headers=headers, data=request_data, verify=False)
     response_json = response_str.json()
     case_Id = response_json["caseInfo"]["cases"][0]["caseId"]
     return case_Id
@@ -636,7 +646,7 @@ def get_aGroup_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_alert_groups_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     aGroupId = response_json["agroupinfo"]["agroups"][0]["agroupID"]
     return aGroupId

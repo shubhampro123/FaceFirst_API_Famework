@@ -241,7 +241,7 @@ def get_event_search():
                     "eventIds": [data[6]]}
     request_data = json.dumps(request_body)
     print(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers, params=params)
+    response_str = requests.post(url, data=request_data, headers=headers, params=params, verify=False)
     response_json = response_str.json()
     print(response_json)
     return response_str, response_json
@@ -254,7 +254,7 @@ def get_user_by_id_request():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_by_id_endpoint()}"
     params = {"id": user_id}
-    response_str = requests.get(url, headers=headers, params=params)
+    response_str = requests.get(url, headers=headers, params=params, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -263,7 +263,7 @@ def get_user_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     user_id = response_json[1]["id"]
     accountId = response_json[0]["accountId"]
@@ -282,7 +282,7 @@ def get_visitors_request():
                     "visitorIds": [data[6]]}
     request_data = json.dumps(request_body)
     print(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers, params=params)
+    response_str = requests.post(url, data=request_data, headers=headers, params=params, verify=False)
     print(response_str)
     response_json = response_str.json()
     print(response_json)
@@ -303,7 +303,7 @@ def notes_search_request():
                     "offset": data[4],
                     "OrderBy": data[5]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -327,7 +327,7 @@ def create_notes_request():
     headers = {"Authorization": f"Token {token}"}
 
     print(request_body)
-    response_str = requests.post(url, request_body, headers=headers, files=files)
+    response_str = requests.post(url, request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     print("response_json", response_json)
     return request_body, response_str, response_json
@@ -337,7 +337,7 @@ def get_profile_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}api/Profiles"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_json["profiles"][0]["profileId"]
 
@@ -348,7 +348,7 @@ def get_enrollment_group_by_id():
     data = create_enrollment_group_request(3)
     form_data = {"id": data[3]}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_enrollment_group_endpoint()}"
-    response_str = requests.get(url, params=form_data, headers=headers)
+    response_str = requests.get(url, params=form_data, headers=headers, verify=False)
     response_json = response_str.json()
     return form_data, response_str, response_json
 
@@ -362,7 +362,7 @@ def get_visitor_search_jobs_search():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_visitor_search_jobs_search_endpoint()}"
     form_data = {"EndDate": data[0], "ResultsDeleted": data[1], "StartDate": data[2],
                  "UserId": user_id[2], "count": data[4], "offset": data[5]}
-    response_str = requests.get(url, params=form_data, headers=headers)
+    response_str = requests.get(url, params=form_data, headers=headers, verify=False)
     response_json = response_str.json()
     return form_data, response_str, response_json
 

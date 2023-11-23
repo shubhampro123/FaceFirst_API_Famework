@@ -96,7 +96,7 @@ def get_all_zones():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -105,6 +105,6 @@ def get_single_zone_by_id(zone_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_zone_by_id_endpoint(zone_id)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json

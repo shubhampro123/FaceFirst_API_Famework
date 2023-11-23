@@ -2,6 +2,7 @@ import requests
 
 from API_Utilities.Api_Base import time_entry, response_validation, excel_result, login_token, API_Base_Utilities
 from All_API_Methods_Package.Enrollment_Group_Module_API.Enrollment_Group_API_Methods import get_case_id
+from All_API_Methods_Package.Identify_and_Enroll_Module_API.Identify_Enroll_Module_API import create_enrollment_request
 from Config_Package.API_INI_Config_Files.Api_Endpoints_Read_ini import Read_API_Endpoints
 
 
@@ -23,8 +24,8 @@ class Enrollment_Data_API_Methods:
             self.row = 2
             time_entry(self.row, "start_time", self.sheet_name)
             token = login_token()
-            # case_id = create_enrollment_request()[3]
-            case_id = get_case_id(token)
+            case_id = create_enrollment_request()[3]
+            # case_id = get_case_id(token)
             print(case_id)
             response_list = get_enrollment_data_by_enrollment_id_request(case_id)
             self.response = response_list[0]
@@ -122,7 +123,7 @@ def get_enrollment_data_by_enrollment_id_request(case_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_data_by_id_endpoint(case_id)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -137,7 +138,7 @@ def get_enrollment_data_by_page_number_and_batch_size_request():
         "pageNumber": 0,
         "batchSize": 5,
     }
-    response_str = requests.get(url, headers=headers, params=query_param)
+    response_str = requests.get(url, headers=headers, params=query_param, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -146,6 +147,6 @@ def get_enrollment_data_count_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_data_count_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json

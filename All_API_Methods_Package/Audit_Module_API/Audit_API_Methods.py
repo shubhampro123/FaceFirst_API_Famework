@@ -219,7 +219,7 @@ def get_all_account():
     request_body = {
         "userIds": [userIds], "startDate": data[1], "endDate": data[2]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, request_data, headers=headers)
+    response_str = requests.post(url, request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -236,7 +236,7 @@ def get_all_account_user():
     request_body = {
         "userIds": [userIds], "startDate": data[1], "endDate": data[2]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, request_data, headers=headers)
+    response_str = requests.post(url, request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -252,7 +252,7 @@ def get_all_account_login():
     request_body = {
         "userIds": [userIds], "startDate": data[1], "endDate": data[2]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, request_data, headers=headers)
+    response_str = requests.post(url, request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -261,7 +261,7 @@ def get_all_login_users():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_request_audit_logins()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -273,7 +273,7 @@ def verify_audit_threshold_changes():
     data = get_all_account_test_data(5)
     request_body = {"endDate": data[2], "startDate": data[1], "userIds": [None]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, request_data, headers=headers)
+    response_str = requests.post(url, request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return response_str, response_json

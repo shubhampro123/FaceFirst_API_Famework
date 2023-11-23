@@ -463,7 +463,7 @@ def start_search_request():
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, headers=headers, data=request_data, files=files)
+    response_str = requests.post(url, headers=headers, data=request_data, files=files, verify=False)
     response_json = response_str.json()
     print(response_json)
     job_id = response_json["jobId"]
@@ -477,7 +477,7 @@ def fed_search_status_request(job_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().fed_search_status_endpoint(job_id)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_str)
     print(response_json)
@@ -489,7 +489,7 @@ def get_visitor_image_by_image_id(image_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_visitors_image_by_image_id_endpoint(image_id)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_str)
     return response_str, response_json
@@ -512,7 +512,7 @@ def get_region_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     return response_str.json()["zoneInfo"]["zones"][1]["regionId"]
 
 
@@ -527,7 +527,7 @@ def identify_alien_federated_request():
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, headers=headers, data=request_data, files=files)
+    response_str = requests.post(url, headers=headers, data=request_data, files=files, verify=False)
     response_json = response_str.json()
     print(url)
     print(response_str)
@@ -548,7 +548,7 @@ def delete_alien_federated_request(job_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_alien_federated_endpoint(job_id)}"
     print(url)
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_str)
     return response_str, response_json
@@ -559,7 +559,7 @@ def get_alien_image_by_image_id(image_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_alien_image_endpoint(image_id)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     print(response_str)
     return response_str
 
@@ -569,7 +569,7 @@ def get_identify_alien_federated_status(job_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_identify_alien_federated_status_endpoint(job_id)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_str)
     return response_str, response_json
@@ -580,7 +580,7 @@ def get_query_alien_face_info(image_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_query_alien_face_info_endpoint(image_id)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_str)
     return response_str, response_json
@@ -598,12 +598,12 @@ def identify_cancel_federated_request():
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, headers=headers, data=request_data, files=files)
+    response_str = requests.post(url, headers=headers, data=request_data, files=files, verify=False)
     response_json = response_str.json()
     print(response_json)
     job_id = response_json["jobId"]
     cancel_federated_url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().put_identify_cancel_federated_endpoint(job_id)}"
-    cancel_federated_resp = requests.put(cancel_federated_url, headers=headers)
+    cancel_federated_resp = requests.put(cancel_federated_url, headers=headers, verify=False)
     response_json = cancel_federated_resp.json()
     return response_str, response_json
 
@@ -615,7 +615,7 @@ def get_query_alien_federated_identification_log():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_query_alien_federated_identification_log_endpoint(result_deleted, count)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_str)
     return response_str, response_json
@@ -632,7 +632,7 @@ def visitor_search_request():
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"startTime": data[3]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, headers=headers, data=request_data)
+    response_str = requests.post(url, headers=headers, data=request_data, verify=False)
     response_json = response_str.json()
     print(response_json)
     return request_data, response_str, response_json
@@ -657,7 +657,7 @@ def get_verify_visitor_count_by_zone():
                    "Asian": data[5], "Indian": data[6], "Other" : data[7], "UnknownEthnicity": data[8],
                    "StartAge": data[9], "EndAge": data[10], "Ascending": data[11], "Count": data[12]
                    }
-    response_str = requests.get(url, headers=headers, params=query_param)
+    response_str = requests.get(url, headers=headers, params=query_param, verify=False)
     response_json = response_str.json()
     print(response_str)
     return response_str, response_json

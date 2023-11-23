@@ -23,7 +23,8 @@ class Enrollment_Group_Data_API_Methods:
         try:
             self.row = 2
             time_entry(self.row, "start_time", self.sheet_name)
-            c_group_id = get_all_enrollment_group_request()[1][2]["id"]
+            # c_group_id = get_all_enrollment_group_request()[1][2]["id"]
+            c_group_id = create_enrollment_group_request(3)[3]
             print(c_group_id)
             response_list = get_enrollment_group_data_by_enrollment_group_id_request(c_group_id)
             self.response = response_list[0]
@@ -122,7 +123,7 @@ def get_enrollment_group_data_by_enrollment_group_id_request(c_group_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_group_data_by_id_endpoint(c_group_id)}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -137,7 +138,7 @@ def get_enrollment_group_data_by_page_number_and_batch_size_request():
             "pageNumber": 0,
             "batchSize": 5,
         }
-    response_str = requests.get(url, headers=headers, params=query_param)
+    response_str = requests.get(url, headers=headers, params=query_param, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -146,6 +147,6 @@ def get_enrollment_group_data_count_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_group_data_count_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json

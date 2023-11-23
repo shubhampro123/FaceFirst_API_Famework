@@ -299,7 +299,7 @@ def login_request(row_no):
     lon = data[3]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_login_endpoint()}"
     form_data = {"username": username, "password": password, "lat": lat, "lon": lon}
-    response_str = requests.post(url, form_data)
+    response_str = requests.post(url, form_data, verify=False)
     response_json = response_str.json()
     return url, response_str, response_json, form_data, username
 
@@ -307,7 +307,7 @@ def login_request(row_no):
 def get_login_request():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_login_endpoint()}"
     print(url)
-    response_str = requests.get(url)
+    response_str = requests.get(url, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -315,7 +315,7 @@ def get_login_request():
 def get_query_login_info_request():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().query_login_info_endpoint()}"
     query_params = {"byPassSSO": "false"}
-    response_str = requests.get(url, params=query_params)
+    response_str = requests.get(url, params=query_params, verify=False)
     response_json = response_str.json()
     return query_params, response_str, response_json
 
@@ -324,7 +324,7 @@ def logout_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().logout_endpoint()}"
-    response_str = requests.post(url, headers=headers)
+    response_str = requests.post(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 

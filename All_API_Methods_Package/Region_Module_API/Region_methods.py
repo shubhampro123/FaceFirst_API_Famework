@@ -438,7 +438,7 @@ def get_region_request_by_account_id():
     account_id = get_user_request()
     params = {'accountid': account_id[3], 'edgeOnly': 'false'}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_id_endpoint()}"
-    response_str = requests.get(url, params=params, headers=headers)
+    response_str = requests.get(url, params=params, headers=headers, verify=False)
     response_json = response_str.json()
     get_id = response_json[0]["id"]
     return response_str, response_json, get_id
@@ -450,7 +450,7 @@ def get_request_by_region_id():
     region_id = get_region_request_by_account_id()
     params = {'includeCameras': 'false'}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_by_id_endpoint(region_id[2])}"
-    response_str = requests.get(url, params=params, headers=headers)
+    response_str = requests.get(url, params=params, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -459,7 +459,7 @@ def select_region():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     region = response_json["zoneInfo"]["zones"][0]["zoneId"]
     return region
@@ -470,7 +470,7 @@ def get_region_by_region_path():
     headers = {"Authorization": f"Token {token}"}
     region_id = get_region_request_by_account_id()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_by_region_path(region_id[2])}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     # act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
     return response_str, response_json
@@ -481,7 +481,7 @@ def get_request_region_by_descendants():
     headers = {"Authorization": f"Token {token}"}
     region_id = get_region_request_by_account_id()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_by_descendants(region_id[2])}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     get_id = response_json[0]["id"]
     account_id = response_json[0]["accountId"]
@@ -501,8 +501,10 @@ def get_request_update_region_by_id():
     request_body = {"code": request_id[4], "name": request_id[5], "unitType": 1, "timezone": request_id[6],
                     "accountId": request_id[3]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    print(request_data)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
+    print(response_json)
     region_id = response_json["data"]
     return request_data, response_str, response_json, region_id
 
@@ -512,7 +514,7 @@ def get_regions_by_cameras():
     headers = {"Authorization": f"Token {token}"}
     region_id = get_request_region_by_descendants()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_id_by_cameras(region_id[2])}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     # act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
     return response_str, response_json
@@ -524,7 +526,7 @@ def get_create_regions_migrate_events():
     zone_id = get_all_zones()
     print(zone_id)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_by_migrate_events(zone_id[0])}"
-    response_str = requests.post(url, zone_id[0], headers=headers)
+    response_str = requests.post(url, zone_id[0], headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     # act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
@@ -535,10 +537,12 @@ def get_all_zones():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
+    print(url)
     query_params = {"offset": 0}
-    response_str = requests.get(url, params=query_params, headers=headers)
+    response_str = requests.get(url, params=query_params, headers=headers, verify=False)
     response_json = response_str.json()
-    data = response_json["zoneInfo"]["zones"][3]["regionId"]
+    print(response_json)
+    data = response_json["zoneInfo"]["zones"][2]["regionId"]
     account_id = response_json["zoneInfo"]["zones"][1]["accountId"]
     return data, account_id
 
@@ -551,7 +555,7 @@ def get_regions_import():
         json_data = json.load(json_file)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_import_file()}"
     form_data = {'File': ('json_file.json', json.dumps(json_data), 'application/json')}
-    response_str = requests.post(url, files=form_data, headers=headers)
+    response_str = requests.post(url, files=form_data, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -571,8 +575,9 @@ def create_request_regions():
                                  "state": data[13], "country": data[14], "postalCode": data[15],
                                  "geocode": [data[16]]}}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
+    print(response_json)
     region_id = response_json["data"]
     return response_str, response_json, request_body, region_id
 
@@ -593,7 +598,7 @@ def create_request_regions_by_descendants():
                                  "state": data[13], "country": data[14], "postalCode": data[15],
                                  "geocode": [data[16]]}}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     region_id = response_json["data"]
     return response_str, response_json, request_body, region_id
@@ -612,7 +617,7 @@ def create_request_regions_by_move():
             break
     params = {'SourceId': source_id, 'DestinationId': DestinationId, 'ByCode': False}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_move_regions()}"
-    response_str = requests.post(url, params=params, headers=headers)
+    response_str = requests.post(url, params=params, headers=headers, verify=False)
     response_json = response_str.json()
     data_id = response_json["data"]
     return response_str, response_json, params, data_id
@@ -623,7 +628,7 @@ def delete_region_request():
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     region_id = create_request_regions_by_descendants()[3]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_region_endpoint(region_id)}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     data_id = response_json["data"]
     return response_str, response_json, data_id

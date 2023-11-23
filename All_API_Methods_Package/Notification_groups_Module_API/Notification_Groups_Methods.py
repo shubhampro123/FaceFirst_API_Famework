@@ -449,7 +449,7 @@ def get_user_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     user_id = response_json[1]["id"]
     accountId = response_json[0]["accountId"]
@@ -468,7 +468,7 @@ def create_notification_group_with_users_enrollment_group_zones():
     request_body = {"name": username, "description": data[1], "ownerID": user_info_list[0], "userIds": [user_info_list[3]],
                     "caseGroupIdsUserIds": [case_group_id],"zoneIds":[all_users_zone_id]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, username
 
@@ -483,7 +483,7 @@ def create_notification_group_without_users_enrollment_group_zones():
     request_body = {"agroupID": bool(data[0]), "description": data[1], "name": username, "ownerID": user_info_list[0],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, username
 
@@ -497,7 +497,7 @@ def create_duplicate_notification_group(alert_name):
     request_body = {"agroupID": bool(data[0]), "description": data[1], "name": alert_name, "ownerID": user_info_list[0],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -506,7 +506,7 @@ def get_all_notification_groups():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_alert_groups_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -515,7 +515,7 @@ def get_notification_group_using_id(a_group_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_alert_group_using_ID(a_group_id)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -531,7 +531,7 @@ def edit_alert_group_request(alert_id, alert_name):
     request_body = {"agroupID": alert_id, "description": data[1], "name": alert_name, "ownerID":user_info_list[3],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -555,7 +555,7 @@ def add_user_to_alert_group_request(alert_id):
     request_body = {"agroupID": alert_id, "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
     print("request_data",request_data)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print("response_json",response_json)
     return request_body, response_str, response_json
@@ -580,7 +580,7 @@ def remove_user_from_alert_group_request(alert_id):
     request_body = {"agroupID": alert_id, "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
     print("request_data",request_data)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print("response_json",response_json)
     return request_body, response_str, response_json
@@ -606,7 +606,7 @@ def get_user_info():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_main_user_info()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_json["accountId"], response_json["regionId"], response_json["userName"], response_json["userId"], response_json["userRoleId"]
 
@@ -620,7 +620,7 @@ def get_all_device_zone_id():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_zone_id()}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_json["zoneInfo"]["zones"][0]["zoneId"]
 
@@ -638,7 +638,7 @@ def get_enrollment_group_id():
     request_body = {"name": enrollment_name, "description": data[1], "faceThreshold": data[2], "maskedFaceThreshold": data[3],
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6], "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return response_json["data"]
 
@@ -652,7 +652,7 @@ def get_delete_user_request(alert_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_alert_group(alert_id)}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -665,7 +665,7 @@ def add_enrollment_to_alert_group_request(enrollment_group_id, alert_id):
     request_body = {"CGroupID": enrollment_group_id, "AGroupID": alert_id}
     request_data = json.dumps(request_body)
     print("request_data",request_data)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print("response_json",response_json)
     return request_body, response_str, response_json

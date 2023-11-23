@@ -200,7 +200,7 @@ def create_tags_request(row_no):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     # request_data = {"name": tag_name, "seriousEvent": data[1], "type": data[2]}
     # request_data = json.dumps(request_data)
-    response_str = requests.post(url, headers=headers)
+    response_str = requests.post(url, headers=headers, verify=False)
     # print(request_data)
     response_json = response_str.json()
     print(response_json)
@@ -223,7 +223,7 @@ def update_tags_request():
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"id": tag_name_and_id[1], "seriousEvent": data[1], "newName": data[2], "type": data[3]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, data
 
@@ -236,7 +236,7 @@ def get_all_tags():
     # role_id_exp = data[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_tags_endpoint()}"
     print(url)
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     tags = response_json
     # tags_id_list = []
@@ -250,7 +250,7 @@ def get_tags_by_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_tags_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     tags = response_json.get("tags", [])
     # tag_ids = [tag.get("id") for tag in tags]
@@ -264,7 +264,7 @@ def get_tags_by_id_request():
     headers = {"Authorization": f"Token {token}"}
     role_id = create_tags_request(2)[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_user_role_by_id_endpoint(role_id)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     # act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
     return response_str, response_json, role_id
@@ -277,7 +277,7 @@ def del_tags_by_id_request():
     role_id = response_list[2]
     print(role_id)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().del_tags_by_id_endpoint(role_id)}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return response_str, response_json, role_id

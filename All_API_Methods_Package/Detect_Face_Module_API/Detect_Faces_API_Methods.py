@@ -68,7 +68,7 @@ def create_detect_face_request(row_no):
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, headers=headers, data=request_data, files=files)
+    response_str = requests.post(url, headers=headers, data=request_data, files=files, verify=False)
     response_json = response_str.json()
     # role_id = response_json["id"]
     return response_str, response_json, detect_faces

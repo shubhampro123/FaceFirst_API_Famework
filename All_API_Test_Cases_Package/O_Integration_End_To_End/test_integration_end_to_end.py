@@ -37,7 +37,7 @@ class Test_integration_api(API_Base_Utilities):
             assert False
 
     def test_integration_Test_05(self):
-        self.logger.info("test_integration_Test_04  : Execution Started >>")
+        self.logger.info("test_integration_Test_05  : Execution Started >>")
         if Integration_API_Methods(self.logger).verify_approve_enrollment_end_to_end_integration_flow():
             assert True
         else:

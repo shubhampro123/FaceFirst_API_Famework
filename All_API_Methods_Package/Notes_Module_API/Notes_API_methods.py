@@ -413,7 +413,7 @@ def create_notes_request():
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, request_body, headers=headers, files=files)
+    response_str = requests.post(url, request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -422,7 +422,7 @@ def get_profile_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}api/Profiles"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_json["profiles"][0]["profileId"]
 
@@ -439,7 +439,7 @@ def get_notes_using_id(note_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_notes_endpoint(note_id)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -459,7 +459,7 @@ def edit_notes_request(note_id):
                     }
     request_data = json.dumps(request_body)
     print(request_data)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return request_body, response_str, response_json
@@ -477,7 +477,7 @@ def delete_notes_request(note_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().delete_notes_endpoint(note_id)}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -492,7 +492,7 @@ def clear_notes_request(note_id):
                     "NoteId": note_id
                     }
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -519,7 +519,7 @@ def add_image_request(note_id):
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, request_body, headers=headers, files=files)
+    response_str = requests.post(url, request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -537,7 +537,7 @@ def get_image_using_note_id(note_id):
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_images_endpoint(note_id)}"
     request_body = {"thumbnail_width": "200"}
-    response_str = requests.get(url, headers=headers, params=request_body)
+    response_str = requests.get(url, headers=headers, params=request_body, verify=False)
     return response_str
 
 
@@ -547,7 +547,7 @@ def delete_image_request(note_id, image_id):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"noteId": note_id, "imageIds": [image_id]}
     request_data = json.dumps(request_body)
-    response_str = requests.delete(url, data=request_data, headers=headers)
+    response_str = requests.delete(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -566,7 +566,7 @@ def notes_search_request():
                     "OrderBy": data[5]
                     }
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -593,7 +593,7 @@ def aggregates_by_geospatial_request():
                     "regionIds": [get_region_id()],
                     }
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -602,7 +602,7 @@ def get_region_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_zones_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     return response_str.json()["zoneInfo"]["zones"][1]["regionId"]
 
 
@@ -631,7 +631,7 @@ def create_notes_to_a_person_request():
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, request_body, headers=headers, files=files)
+    response_str = requests.post(url, request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, case_id
 
@@ -649,7 +649,7 @@ def get_by_enrollment_request(case_id):
                     "orderBy": data[4]
                     }
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 

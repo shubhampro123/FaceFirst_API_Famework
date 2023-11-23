@@ -627,8 +627,10 @@ class Users_API_Methods:
 
 def user_create_request(row_no):
     token = login_token()
+    print("token",token)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().users_endpoint()}"
     data = users_test_data(row_no)
+    print(data)
     headers = {"Authorization": f"Token {token}"}
     form_data = {"auth_params": data[0], "company": data[1], "title": data[2], "department": data[3],
                  "enabled": data[4], "fname": data[5], "mname": data[6], "lname": data[7],
@@ -637,8 +639,10 @@ def user_create_request(row_no):
                  "wphone": data[16], "fphone": data[17], "aphone": data[18], "phone_type": data[19],
                  "provider": data[20], "timezone": data[21], "urole_id": select_user_role(),
                  "region_id": select_region(), "username": f"{data[24]}{random_number()}", "password": data[25]}
-    response_str = requests.post(url, form_data, headers=headers)
+    print(form_data)
+    response_str = requests.post(url, form_data, headers=headers, verify=False)
     response_json = response_str.json()
+    print(response_json)
     user_id = response_json["userId"]
     account_id = response_json["accountId"]
     username = response_json["userName"]
@@ -662,7 +666,7 @@ def edite_user_request():
                  "provider": data[20], "timezone": data[21], "urole_id": select_user_role(),
                  "region_id": select_region(), "user_id": user_id, "pw_current": data[25], "pw_new1": data[26],
                  "pw_new2": data[27]}
-    response_str = requests.put(url, form_data, headers=headers)
+    response_str = requests.put(url, form_data, headers=headers, verify=False)
     response_json = response_str.json()
     return form_data, response_str, response_json
 
@@ -684,7 +688,7 @@ def edite_user_json_data_request():
                  "Lname": data[23], "Wphone": data[24], "Mname": data[25], "Title": data[26],
                  "Timezone": data[27], "Password": data[28], "Aemail": data[29], "Email": data[30],
                  "Company": data[31], "Auth_params": data[31]}
-    response_str = requests.put(url, form_data, headers=headers)
+    response_str = requests.put(url, form_data, headers=headers, verify=False)
     response_json = response_str.json()
     return form_data, response_str, response_json, user_id
 
@@ -705,7 +709,7 @@ def users_update_alert_schedule_request():
                                        {"enabled": data[18], "startTime": data[19], "endTime": data[20]},
                                        {"enabled": data[21]}, {"enabled": data[22]}]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -717,7 +721,7 @@ def get_user_request_by_account_id():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_by_account_id_endpoint()}"
     params = {"AccountId": accountID}
-    response_str = requests.get(url, headers=headers, params=params)
+    response_str = requests.get(url, headers=headers, params=params, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -726,7 +730,7 @@ def get_user_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     user_id = response_json[1]["id"]
     accountId = response_json[0]["accountId"]
@@ -740,7 +744,7 @@ def get_user_by_id_request():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_by_id_endpoint()}"
     params = {"id": user_id}
-    response_str = requests.get(url, headers=headers, params=params)
+    response_str = requests.get(url, headers=headers, params=params, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -763,7 +767,7 @@ def create_users_using_json():
                     "user_id": id_data[2], "userName": username, "wphone": data[31],
                     "zip": data[32]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, username
 
@@ -780,7 +784,7 @@ def edit_user_password():
     request_body = {"userName": username, "userId": user_id, "currentPassword": current_password,
                     "newPassword": data[3], "isServiceUserRequest": data[4], "isPasswordExpired": True}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -839,8 +843,10 @@ def random_number():
 
 
 def select_user_role():
+    token = login_token()
+    headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().user_role_endpoint()}"
-    response_str = requests.get(url)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     user_role = response_json["userRoleInfo"]["userRoles"][0]["userRoleId"]
     return user_role
@@ -850,7 +856,7 @@ def select_region():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     region = response_json["zoneInfo"]["zones"][0]["zoneId"]
     return region
@@ -860,7 +866,7 @@ def get_user_info_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_user_info_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -869,7 +875,7 @@ def get_service_user_true_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_service_user_true_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -885,7 +891,7 @@ def get_service_user_false_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_service_user_false_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -901,7 +907,7 @@ def get_user_id_or_account_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_users_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     user_id = response_json[0]["id"]
     account_id = response_json[0]["accountId"]
@@ -912,7 +918,7 @@ def get_users_alert_schedule_request(user_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_alert_schedule_endpoint(user_id)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -925,7 +931,7 @@ def get_delete_user_from_system_request(user_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_delete_user_from_system_endpoint(user_id)}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -934,6 +940,6 @@ def get_delete_user_request(user_id):
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_delete_user_endpoint(user_id)}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json

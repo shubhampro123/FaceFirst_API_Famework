@@ -241,7 +241,7 @@ def create_user_role_request(row_no):
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().user_role_endpoint()}"
     data = user_role_test_data(row_no)
     role_name = f"{data[0]}{random_number()}"
-    headers = {"Authorization": f"{token}", "Content-Type": "application/json"}
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_data = {"rolename": role_name, "enabled": data[1], "description": data[2],
                     "permissions": {"user": data[3], "alert": data[4], "alertGroup": data[5], "station": data[6],
                                     "blob": data[7],
@@ -255,9 +255,10 @@ def create_user_role_request(row_no):
                                     "profile": data[24],
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     role_id = response_json["id"]
+    print()
     return request_data, response_str, response_json, role_name, role_id
 
 
@@ -283,7 +284,7 @@ def update_user_role_request(row_no):
                                     "profile": data[24],
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_data, response_str, response_json, role_name
 
@@ -307,7 +308,7 @@ def create_user_role_request_disable(row_no):
                                     "profile": data[24],
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     role_id = response_json["id"]
     return request_data, response_str, response_json, role_name, role_id
@@ -319,7 +320,7 @@ def get_single_user_role():
     data = create_user_role_request(2)
     role_id_exp = data[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_user_role_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     user_roles = response_json["userRoleInfo"]["userRoles"]
     roles_id_list = []
@@ -334,7 +335,7 @@ def get_all_user_role():
     data = create_user_role_request(2)
     role_id_exp = data[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_all_user_role_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     user_roles = response_json["userRoleInfo"]["userRoles"]
     roles_id_list = []
@@ -348,7 +349,7 @@ def get_user_role_by_id_request():
     headers = {"Authorization": f"Token {token}"}
     role_id = create_user_role_request(2)[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_user_role_by_id_endpoint(role_id)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
     return response_str, response_json, role_id, act_role_id
@@ -359,7 +360,7 @@ def del_user_role_by_id_request():
     headers = {"Authorization": f"Token {token}"}
     role_id = create_user_role_request(2)[4]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().del_user_role_by_id_endpoint(role_id)}"
-    response_str = requests.delete(url, headers=headers)
+    response_str = requests.delete(url, headers=headers, verify=False)
     response_json = response_str.json()
     # act_role_id = response_json["userRoleInfo"]["userRoles"][0]["id"]
     return response_str, response_json, role_id

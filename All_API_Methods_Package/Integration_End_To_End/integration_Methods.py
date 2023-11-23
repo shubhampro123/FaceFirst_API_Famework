@@ -126,6 +126,7 @@ class Integration_API_Methods:
             time_entry(self.row, "start_time", self.sheet_name)
             response_list = integration_end_to_end_VS_with_only_meta_data_request()
             self.response = response_list[1]
+            print(response_list[0])
             if False not in response_list[0]:
                 excel_result(self.row, "Test_04", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg, True, self.sheet_name)
@@ -161,6 +162,7 @@ class Integration_API_Methods:
             time_entry(self.row, "start_time", self.sheet_name)
             response_list = approve_enrollment_end_to_end_flow()
             self.response = response_list[1]
+            print(response_list[0])
             if False not in response_list[0]:
                 excel_result(self.row, "Test_05", self.r_body, self.json_response, self.response.status_code,
                              self.act_msg, True, self.sheet_name)
@@ -240,7 +242,7 @@ def create_request_for_user_role(row):
                                     "profile": data[24],
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     role_id = response_json["id"]
     result = response_validation(response_str)
@@ -251,7 +253,7 @@ def get_user_info_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_user_info_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     region_id = response_json["regionId"]
     return response_str, response_json, region_id
@@ -274,7 +276,7 @@ def user_request_for_create_user(row):
                  "wphone": data[16], "fphone": data[17], "aphone": data[18], "phone_type": data[19],
                  "provider": data[20], "timezone": data[21], "urole_id": user_role[4],
                  "region_id": data[23], "username": f"{data[24]}{random_number()}", "password": data[25]}
-    response_str = requests.post(url, form_data, headers=headers)
+    response_str = requests.post(url, form_data, headers=headers, verify=False)
     response_json = response_str.json()
     user_id = response_json["userId"]
     account_id = response_json["accountId"]
@@ -294,7 +296,7 @@ def create_notification_group(row):
     request_body = {"agroupID": bool(data[0]), "description": data[1], "name": username, "ownerID": user_info_list[0],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     a_group_id = response_json["data"]
     result = response_validation(response_str)
@@ -311,7 +313,7 @@ def create_enrollment_group_request(row):
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
                     "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     data = response_json["data"]
     return request_body, response_str, response_json, data
@@ -333,7 +335,7 @@ def add_user_to_alert_group_VS_request(row, group_id):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": a_group_id[4], "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     result.append(response_validation(response_str))
     return request_body, response_str, response_json, result
@@ -352,7 +354,7 @@ def add_user_to_alert_group_request(row, group_id):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": a_group_id[4], "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     result.append(response_validation(response_str))
     return request_body, response_str, response_json, result, username, password
@@ -372,7 +374,7 @@ def add_enrollment_to_alert_group_VS_request(row):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"CGroupID": enrollment_group_id, "AGroupID": alert_id[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, alert_id, enrollment_group_id
 
@@ -385,7 +387,7 @@ def add_enrollment_to_alert_group_request(row):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"CGroupID": enrollment_group_id[3], "AGroupID": alert_id[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, alert_id, enrollment_group_id[3]
 
@@ -430,21 +432,32 @@ def get_data(row_no, start_column, end_column):
     return data
 
 
-def start_search_request():
+def start_search_request(image_path):
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
-    region_id = get_user_info_request()
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    # region_id = get_user_info_request()
+    row_no = 2
+    data = start_search_data(row_no)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
     files = [
         ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    request_data = {"threshold": 0.25, "regionId": region_id[2]}
-    response_str = requests.post(url, headers=headers, files=files, data=request_data)
+    # request_data = {"threshold": 0.25, "regionId": region_id[2]}
+    request_data = {"threshold": data[0], "regionId": data[1]}
+    response_str = requests.post(url, headers=headers, files=files, data=request_data, verify=False)
     response_json = response_str.json()
     job_id = response_json["jobId"]
     # role_id = response_json["id"]
     return response_str, response_json, job_id
+
+
+def start_search_data(row_no):
+    data = []
+    for x in range(3, 5):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().integration_Test_VS_data_sheet_name(), row_no, x))
+    return data
 
 
 def get_fed_search_status_request(job_id):
@@ -453,7 +466,7 @@ def get_fed_search_status_request(job_id):
     params = {'jobId': job_id}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().fed_search_status_endpoint(job_id)}"
     print(url)
-    response_str = requests.get(url, params=params, headers=headers)
+    response_str = requests.get(url, params=params, headers=headers, verify=False)
     time.sleep(3)
     print(response_str)
     response_json = response_str.json()
@@ -475,41 +488,50 @@ def new_start_search_request():
     ]
     headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": 0.25, "regionId": region_id[2]}
-    response_str = requests.post(url, headers=headers, files=files, data=request_data)
+    response_str = requests.post(url, headers=headers, files=files, data=request_data, verify=False)
     response_json = response_str.json()
     matched = response_json["matched"]
     size = len(matched)
     return response_str, response_json,
 
 
-def create_enrollment_request(image_id, c_group_id):
+def create_enrollment_request(image_id, c_group_id, test_data_row_num):
     token = login_token()
     # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img2.png"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
-    data = create_enrollment_data(2)
+    data = create_enroll_data(test_data_row_num)
     request_body = {"CgroupId": c_group_id, "OptOut": data[1], "Basis": data[2], "Action": data[3],
                     "ActivityType": data[4], "BodyMarkings": data[5], "Build": data[6],
                     "CaseEventType": data[7], "CaseNumber": data[8], "Enabled": data[9], "Gender": data[10],
                     "HeightType": data[11], "MethodOffence": data[12], "NarrativeDesc": data[13],
                     "ProfileId": get_profile_id(), "ReportedBy": data[15], "ReportedLoss": data[16],
-                    "StoreId": data[17], "TimeIncident": data[18], "RegionId": select_region()}
+                    "StoreId": data[17], "TimeIncident": data[18], "RegionId": data[19]}
 
     image = get_image_using_image_id(image_id)
     files = [
         ('Image', ('image.jpg', image.content, 'image/jpeg'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response = requests.post(url, headers=headers, data=request_body, files=files)
+    response = requests.post(url, headers=headers, data=request_body, files=files, verify=False)
     response_json = response.json()
     caseId = response_json.get("enroll", {}).get("caseId", None)
+
     return request_body, response, response_json, caseId, image
+
+
+def create_enroll_data(row_no):
+    data = []
+    for x in range(13, 33):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().integration_Test_VS_data_sheet_name(), row_no, x))
+    return data
 
 
 def get_image_using_image_id(image_id):
     token = login_token()
-    url = f"https://ff-india-qa10.eastus2.cloudapp.azure.com/api/media/{image_id}/visitor?use_thumbnail=1&blur_images=0"
+    url = f"https://10.0.1.14/api/media/{image_id}/visitor?use_thumbnail=1&blur_images=0"
     headers = {"Authorization": f"Token {token}"}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, verify=False)
     return response
 
 
@@ -517,12 +539,14 @@ def integration_end_to_end_VS_with_pic_request():
     result = []
     case_id = ""
     response_str = ""
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\Visitor.png"
 
     c_groups_ids = integration_user_role_user_enrollment_group_notification_group_creation_request()[2]
+    # c_groups_ids = ['655c9877e92d3cd9275c1928', '655c9884e92d3cd9275c196f', '655c9890e92d3cd9275c19b6', '655c989ce92d3cd9275c19fd', '655c98a8e92d3cd9275c1a44']
     print(c_groups_ids)
 
     # Hit the visitor search request
-    start_search_resp = start_search_request()
+    start_search_resp = start_search_request(image_path)
     job_id = start_search_resp[2]
     print(job_id)
 
@@ -543,7 +567,7 @@ def integration_end_to_end_VS_with_pic_request():
     for x in range(0, len(image_id)):
         time.sleep(2)
         # create enrollment
-        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x])
+        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x],2)
 
         # validation for create enrollment api request
         result.append(response_validation(create_enroll_resp[1]))
@@ -553,19 +577,19 @@ def integration_end_to_end_VS_with_pic_request():
         case_id_list.append(case_id)
 
         # add image to enrollment
-        add_enrollment_image_resp = add_enrollment_image(case_id)
+        add_enrollment_image_resp = add_enrollment_image(case_id, image_path)
 
         # validation for add enrollment image api request
         result.append(response_validation(add_enrollment_image_resp[0]))
 
         # add notes to enrollment
-        add_notes_resp = add_notes_to_enrollment_request(case_id, create_enroll_resp[4])
+        add_notes_resp = add_notes_to_enrollment_request(case_id, image_path, 2)
 
         # validation for add notes to enrollment api request
         result.append(response_validation(add_notes_resp[1]))
 
     # check the enrollment index score
-    identify_enrollment_index_resp = identify_enrollment_index()
+    identify_enrollment_index_resp = identify_enrollment_index(image_path, 2)
 
     # validation for enrollment index score api request
     result.append(identify_enrollment_index_resp[0])
@@ -603,7 +627,7 @@ def is_events_generated(case_id):
     request_body = {"caseId": case_id}
     request_data = json.dumps(request_body)
     print(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers, params=params)
+    response_str = requests.post(url, data=request_data, headers=headers, params=params, verify=False)
     response_json = response_str.json()
     print(response_json)
     if response_json["totalCount"] == 0:
@@ -621,24 +645,24 @@ def search_events(case_id):
     request_body = {"caseId": case_id}
     request_data = json.dumps(request_body)
     print(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers, params=params)
+    response_str = requests.post(url, data=request_data, headers=headers, params=params, verify=False)
     response_json = response_str.json()
     print(response_json)
     event_id = response_json["data"][0]["id"]
     return response_str, response_json, event_id
 
 
-def add_notes_to_enrollment_request(case_id, image):
+def add_notes_to_enrollment_request(case_id, image_path, test_data_row_num):
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_notes_endpoint()}"
-    data = create_notes_data(2)
+    data = create_notes_data(test_data_row_num)
     request_body = {"gender": data[0], "build": data[1], "bodyMarkings": data[2], "narrativeDesc": data[3],
                     "action": data[4], "storeId": data[5], "caseNumber": data[6],
                     "timeIncident": data[7], "reportedBy": data[8], "reportedLoss": data[9],
                     "caseEventType": data[10],
                     "activityType": data[11], "heightType": data[12], "methodOffence": data[13],
-                    "ProfileId": data[14], "CaseId": case_id, "SetCases": data[16],
+                    "ProfileId": get_profile_id(), "CaseId": case_id, "SetCases": data[16],
                     }
 
     # image = get_image_using_image_id(image_id)
@@ -649,22 +673,49 @@ def add_notes_to_enrollment_request(case_id, image):
         ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, headers=headers, data=request_body, files=files)
+    response_str = requests.post(url, headers=headers, data=request_body, files=files, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
 
-def identify_enrollment_index():
+def add_notes_to_enrollment_only_metadata_request(case_id, test_data_row_num):
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_notes_endpoint()}"
+    data = create_notes_data(test_data_row_num)
+    request_body = {"gender": data[0], "build": data[1], "bodyMarkings": data[2], "narrativeDesc": data[3],
+                    "action": data[4], "storeId": data[5], "caseNumber": data[6],
+                    "timeIncident": data[7], "reportedBy": data[8], "reportedLoss": data[9],
+                    "caseEventType": data[10],
+                    "activityType": data[11], "heightType": data[12], "methodOffence": data[13],
+                    "ProfileId": get_profile_id(), "CaseId": case_id, "SetCases": data[16],
+                    }
+
+    # image = get_image_using_image_id(image_id)
+    # files = [
+    #     ('Image', ('image.jpg', image.content, 'image/jpeg'))
+    # ]
+    # files = [
+    #     ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
+    # ]
     headers = {"Authorization": f"Token {token}"}
-    data = identify_enrollment_data(6)
+    # response_str = requests.post(url, headers=headers, data=request_body, files=files)
+    response_str = requests.post(url, headers=headers, data=request_body, verify=False)
+    response_json = response_str.json()
+    return request_body, response_str, response_json
+
+
+def identify_enrollment_index(image_path, test_data_row_num):
+    token = login_token()
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    headers = {"Authorization": f"Token {token}"}
+    data = identify_enrollment_data(test_data_row_num)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().identify_enrollment_endpoint()}"
     request_body = {"DetailLevel": data[0], "MaxMatches": data[1], "IncludeMatrics": data[2]}
     files = [
         ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, data=request_body, headers=headers, files=files)
+    response_str = requests.post(url, data=request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     matches = response_json["id"]["matches"]
     index = []
@@ -678,34 +729,36 @@ def identify_enrollment_index():
 
 def identify_enrollment_data(row_no):
     data = []
-    for x in range(3, 6):
+    for x in range(54, 57):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
-                                      Read_API_Endpoints().identify_enroll_test_data_sheet_name(), row_no, x))
+                                      Read_API_Endpoints().integration_Test_VS_data_sheet_name(), row_no, x))
     return data
 
 
 def create_notes_data(row_no):
     data = []
-    for x in range(12, 29):
+    for x in range(35, 52):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
-                                      Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
+                                      Read_API_Endpoints().integration_Test_VS_data_sheet_name(), row_no, x))
     return data
 
 
 def integration_end_to_end_VS_with_pic_meta_data_request():
     result = []
     response_str = ""
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
 
     c_groups_ids = integration_user_role_user_enrollment_group_notification_group_creation_request()[2]
+    # c_groups_ids = ['655ca47ee92d3cd9275c20c6', '655ca48be92d3cd9275c210d', '655ca499e92d3cd9275c2154', '655ca4a6e92d3cd9275c219b', '655ca4b4e92d3cd9275c21e2']
     print(c_groups_ids)
 
-    start_search_resp = start_search_with_pic_metadata_request()
+    start_search_resp = start_search_with_pic_metadata_request(image_path)
     job_id = start_search_resp[2]
     print(job_id)
 
     # validation for start search api request
     result.append(response_validation(start_search_resp[0]))
-    time.sleep(10)
+    time.sleep(20)
 
     # fetch the results of the visitor search
     fed_search_resp = get_fed_search_status_request(job_id)
@@ -720,7 +773,7 @@ def integration_end_to_end_VS_with_pic_meta_data_request():
     for x in range(0, len(image_id)):
         time.sleep(2)
         # create enrollment
-        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x])
+        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x], 4)
 
         # validation for create enrollment api request
         result.append(response_validation(create_enroll_resp[1]))
@@ -730,19 +783,19 @@ def integration_end_to_end_VS_with_pic_meta_data_request():
         case_id_list.append(case_id)
 
         # add image to enrollment
-        add_enrollment_image_resp = add_enrollment_image_pic_and_metadata(case_id)
+        add_enrollment_image_resp = add_enrollment_image_pic_and_metadata(case_id, image_path)
 
         # validation for add enrollment image api request
         result.append(response_validation(add_enrollment_image_resp[0]))
 
         # add notes to enrollment
-        add_notes_resp = add_notes_to_enrollment_request(case_id, create_enroll_resp[4])
+        add_notes_resp = add_notes_to_enrollment_request(case_id, image_path, 4)
 
         # validation for add notes to enrollment api request
         result.append(response_validation(add_notes_resp[1]))
 
     # check the enrollment index score
-    identify_enrollment_index_resp = identify_enrollment_index()
+    identify_enrollment_index_resp = identify_enrollment_index(image_path, 2)
 
     # validation for enrollment index score api request
     result.append(identify_enrollment_index_resp[0])
@@ -770,12 +823,13 @@ def integration_end_to_end_VS_with_pic_meta_data_request():
     return result, response_str
 
 
-def start_search_with_pic_metadata_request():
+def start_search_with_pic_metadata_request(image_path):
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
     region_id = get_user_info_request()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
-    data = start_search_with_pic_metadata_data(2)
+    data = start_search_with_pic_metadata_data(4)
+    print(data)
     files = [
         ('Images', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
@@ -783,7 +837,7 @@ def start_search_with_pic_metadata_request():
     request_data = {"threshold": data[0], "limit": data[1], "StartDateTime": data[2],
                     "EndDateTime": data[3], "StartAge": data[4], "EndAge": data[5],
                     "IsMale": data[6], "regionId": data[7]}
-    response_str = requests.post(url, headers=headers, files=files, data=request_data)
+    response_str = requests.post(url, headers=headers, files=files, data=request_data, verify=False)
     response_json = response_str.json()
     job_id = response_json["jobId"]
     # role_id = response_json["id"]
@@ -794,7 +848,7 @@ def start_search_with_pic_metadata_data(row_no):
     data = []
     for x in range(3, 11):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
-                                      Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
+                                      Read_API_Endpoints().integration_Test_VS_data_sheet_name(), row_no, x))
     return data
 
 
@@ -803,7 +857,8 @@ def integration_end_to_end_VS_with_only_meta_data_request():
     response_str = ""
 
     c_groups_ids = integration_user_role_user_enrollment_group_notification_group_creation_request()[2]
-    print(c_groups_ids)
+    # c_groups_ids = ['655ca47ee92d3cd9275c20c6', '655ca48be92d3cd9275c210d', '655ca499e92d3cd9275c2154', '655ca4a6e92d3cd9275c219b', '655ca4b4e92d3cd9275c21e2']
+    # print(c_groups_ids)
 
     start_search_resp = start_search_with_only_metadata_request()
     job_id = start_search_resp[2]
@@ -825,7 +880,7 @@ def integration_end_to_end_VS_with_only_meta_data_request():
     for x in range(0, len(image_id)):
         time.sleep(2)
         # create enrollment
-        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x])
+        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x], 5)
 
         # validation for create enrollment api request
         result.append(response_validation(create_enroll_resp[1]))
@@ -835,58 +890,56 @@ def integration_end_to_end_VS_with_only_meta_data_request():
         case_id_list.append(case_id)
 
         # add image to enrollment
-        add_enrollment_image_resp = add_enrollment_image_metadata_only(case_id)
+        # add_enrollment_image_resp = add_enrollment_image_metadata_only(case_id)
 
         # validation for add enrollment image api request
-        result.append(response_validation(add_enrollment_image_resp[0]))
+        # result.append(response_validation(add_enrollment_image_resp[0]))
 
         # add notes to enrollment
-        add_notes_resp = add_notes_to_enrollment_request(case_id, create_enroll_resp[4])
+        add_notes_resp = add_notes_to_enrollment_only_metadata_request(case_id, 5)
 
         # validation for add notes to enrollment api request
         result.append(response_validation(add_notes_resp[1]))
 
     # check the enrollment index score
-    identify_enrollment_index_resp = identify_enrollment_index()
+    # identify_enrollment_index_resp = identify_enrollment_index(5)
 
     # validation for enrollment index score api request
-    result.append(identify_enrollment_index_resp[0])
-    result.append(identify_enrollment_index_resp[2])
+    # result.append(identify_enrollment_index_resp[0])
+    # result.append(identify_enrollment_index_resp[2])
 
     # wait for the events to generate when the video stream is running
-    for c_id in case_id_list:
-        while not is_events_generated(c_id):
-            time.sleep(20)
+    # for c_id in case_id_list:
+    #     while not is_events_generated(c_id):
+    #         time.sleep(20)
 
     # search the events generated for all the enrollments.
-    search_events_resp_event_ids = []
-    for c_id in case_id_list:
-        search_events_resp = search_events(c_id)
-        print(search_events_resp[1])
-        search_events_resp_event_ids.append(search_events_resp[2])
-
-        # validation for search events api request
-        result.append(response_validation(search_events_resp[0]))
+    # search_events_resp_event_ids = []
+    # for c_id in case_id_list:
+    #     search_events_resp = search_events(c_id)
+    #     print(search_events_resp[1])
+    #     search_events_resp_event_ids.append(search_events_resp[2])
+    #
+    #     # validation for search events api request
+    #     result.append(response_validation(search_events_resp[0]))
 
     # add tags to events generated
-    for event_id in search_events_resp_event_ids:
-        add_tags_to_events_resp = add_tags_to_events(event_id)
-        result.append(response_validation(add_tags_to_events_resp[0]))
+    # for event_id in search_events_resp_event_ids:
+    #     add_tags_to_events_resp = add_tags_to_events(event_id)
+    #     result.append(response_validation(add_tags_to_events_resp[0]))
 
     return result, response_str
 
 
 def start_search_with_only_metadata_request():
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
-    region_id = get_user_info_request()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
-    data = start_search_with_only_metadata_data(3)
+    data = start_search_with_only_metadata_data(5)
     headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": data[0], "limit": data[1], "StartDateTime": data[2],
                     "EndDateTime": data[3], "StartAge": data[4], "EndAge": data[5],
                     "IsMale": data[6], "regionId": data[7]}
-    response_str = requests.post(url, headers=headers, data=request_data)
+    response_str = requests.post(url, headers=headers, data=request_data, verify=False)
     response_json = response_str.json()
     job_id = response_json["jobId"]
     # role_id = response_json["id"]
@@ -897,7 +950,7 @@ def start_search_with_only_metadata_data(row_no):
     data = []
     for x in range(3, 11):
         data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
-                                      Read_API_Endpoints().integration_Test_with_metadata_data_sheet_name(), row_no, x))
+                                      Read_API_Endpoints().integration_Test_VS_data_sheet_name(), row_no, x))
     return data
 
 
@@ -911,7 +964,7 @@ def identify_enrollment_index_visitor_search_with_pic():
     files = [
         ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, data=request_body, headers=headers, files=files)
+    response_str = requests.post(url, data=request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     matches = response_json["id"]["matches"]
     index = []
@@ -932,13 +985,13 @@ def add_tags_to_events(event_id):
     tag_type = "Event"
     tag_url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_tags_endpoint(tag_name, serious_event, tag_type)}"
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
-    tag_response_str = requests.post(tag_url, headers=headers)
+    tag_response_str = requests.post(tag_url, headers=headers, verify=False)
     print(tag_response_str)
 
     # get all the tags to fetch the tag id
     get_tag_url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_tags_endpoint()}"
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.get(get_tag_url, headers=headers)
+    response_str = requests.get(get_tag_url, headers=headers, verify=False)
     get_tag_response_json = response_str.json()
     tags_list = get_tag_response_json["tags"]
 
@@ -952,16 +1005,16 @@ def add_tags_to_events(event_id):
     params = {'eventIds': event_id, 'remove': False, 'tagIds': tag_id}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().post_tag_alerts_endpoint()}"
     print(url)
-    response_str = requests.post(url, params=params, headers=headers)
+    response_str = requests.post(url, params=params, headers=headers, verify=False)
     time.sleep(3)
     print(response_str)
     response_json = response_str.json()
     return response_str, response_json
 
 
-def add_enrollment_image(case_id):
+def add_enrollment_image(case_id,image_path):
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
     headers = {"Authorization": f"Token {token}"}
     request_data = {'CaseId': case_id}
     files = [
@@ -969,7 +1022,7 @@ def add_enrollment_image(case_id):
     ]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().add_enrollment_with_image_end_point()}"
     print(url)
-    response_str = requests.post(url, data=request_data, files=files, headers=headers)
+    response_str = requests.post(url, data=request_data, files=files, headers=headers, verify=False)
     time.sleep(3)
     print(response_str)
 
@@ -978,9 +1031,9 @@ def add_enrollment_image(case_id):
     return response_str, response_json
 
 
-def add_enrollment_image_pic_and_metadata(case_id):
+def add_enrollment_image_pic_and_metadata(case_id, image_path):
     token = login_token()
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
     headers = {"Authorization": f"Token {token}"}
     request_data = {'CaseId': case_id}
     files = [
@@ -988,7 +1041,7 @@ def add_enrollment_image_pic_and_metadata(case_id):
     ]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().add_enrollment_with_image_end_point()}"
     print(url)
-    response_str = requests.post(url, data=request_data, files=files, headers=headers)
+    response_str = requests.post(url, data=request_data, files=files, headers=headers, verify=False)
     time.sleep(3)
     print(response_str)
 
@@ -1007,7 +1060,7 @@ def add_enrollment_image_metadata_only(case_id):
     ]
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().add_enrollment_with_image_end_point()}"
     print(url)
-    response_str = requests.post(url, data=request_data, files=files, headers=headers)
+    response_str = requests.post(url, data=request_data, files=files, headers=headers, verify=False)
     time.sleep(3)
     print(response_str)
 
@@ -1032,7 +1085,7 @@ def new_user_login_token(username, password):
                             row_no, 6)
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_login_endpoint()}"
     form_data = {"username": username, "password": password, "lat": lat, "lon": lon}
-    response_str = requests.post(url, form_data)
+    response_str = requests.post(url, form_data, verify=False)
     response_json = response_str.json()
     token = response_json["result"]["token"]
     return token
@@ -1055,7 +1108,7 @@ def user_request_for_create_user_no_approve_en_right(row):
                  "wphone": data[16], "fphone": data[17], "aphone": data[18], "phone_type": data[19],
                  "provider": data[20], "timezone": data[21], "urole_id": user_role[4],
                  "region_id": data[23], "username": f"{data[24]}{random_number()}", "password": data[25]}
-    response_str = requests.post(url, form_data, headers=headers)
+    response_str = requests.post(url, form_data, headers=headers, verify=False)
     response_json = response_str.json()
     user_id = response_json["userId"]
     account_id = response_json["accountId"]
@@ -1094,7 +1147,7 @@ def add_user_to_alert_group_request_approve_en(row, group_id):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": a_group_id[4], "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     result.append(response_validation(response_str))
     return request_body, response_str, response_json, result, username, password
@@ -1115,7 +1168,7 @@ def create_enrollment_request_for_approve_en(image_id, token, C_group_Id):
         ('Image', ('image.jpg', image.content, 'image/jpeg'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response = requests.post(url, headers=headers, data=request_body, files=files)
+    response = requests.post(url, headers=headers, data=request_body, files=files, verify=False)
     response_json = response.json()
     caseId = response_json.get("enroll", {}).get("caseId", None)
     return request_body, response, response_json, caseId, image
@@ -1137,7 +1190,7 @@ def add_enrollment_to_alert_group_request_for_approve_en(row):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"CGroupID": enrollment_group_id[3], "AGroupID": alert_id[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, alert_id
 
@@ -1152,7 +1205,7 @@ def create_enrollment_group_request_for_approve_en(row):
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
                     "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     data = response_json["data"]
     return request_body, response_str, response_json, data
@@ -1168,7 +1221,7 @@ def create_notification_group_for_approve_en(row):
     request_body = {"agroupID": bool(data[0]), "description": data[1], "name": username, "ownerID": user_info_list[0],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     a_group_id = response_json["data"]
     result = response_validation(response_str)
@@ -1194,7 +1247,7 @@ def create_request_for_user_role_for_approve_en(row):
                                     "profile": data[24],
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     role_id = response_json["id"]
     result = response_validation(response_str)
@@ -1210,7 +1263,7 @@ def request_for_pending_review_enrollment(row):
                     "Ascending": data[4],
                     "IsExact": data[5], "Fields": [{"Key": data[6], "Value": data[7]}]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     all_pending_en = response_str.json()["caseInfo"]["cases"]
     response_json = response_str.json()
     all_case_id = []
@@ -1220,11 +1273,12 @@ def request_for_pending_review_enrollment(row):
     for x in all_case_id:
         request_body = {"CaseId": x, "Enabled": 4}
         request_data = json.dumps(request_body)
-        response_str = requests.put(url, data=request_data, headers=headers)
+        response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     return request_data, response_str, response_json
 
 
 def approve_enrollment_end_to_end_flow():
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
     result = []
     row_count = getRowCount(API_Base_Utilities.test_data_excel_path,
                             Read_API_Endpoints().approve_integration_Test_Data_sheet_name())
@@ -1238,6 +1292,7 @@ def approve_enrollment_end_to_end_flow():
         start_search_resp = start_search_request_a(new_user_login_token(username, password))
         job_id = start_search_resp[2]
         result.append(response_validation(start_search_resp[0]))
+        time.sleep(20)
         fed_search_resp = get_fed_search_status_request_a(job_id, new_user_login_token(username, password))
         image_id = fed_search_resp[1]
         result.append(response_validation(fed_search_resp[0]))
@@ -1246,21 +1301,27 @@ def approve_enrollment_end_to_end_flow():
             create_enroll_resp = create_enrollment_request_for_approve_en(image_id[i],
                                                                           new_user_login_token(username, password),
                                                                           data[4])
+            result.append("1")
             result.append(response_validation(create_enroll_resp[1]))
             case_id = create_enroll_resp[3]
-            add_notes_resp = add_notes_to_enrollment_request_a(case_id, create_enroll_resp[4],
+            add_notes_resp = add_notes_to_enrollment_request_a(case_id, image_path,
                                                                new_user_login_token(username, password))
+            result.append("2")
             result.append(response_validation(add_notes_resp[1]))
 
         identify_enrollment_index_resp = identify_enrollment_index_a(new_user_login_token(username, password))
+        result.append("3")
         result.append(identify_enrollment_index_resp[0])
+        result.append("4")
         result.append(identify_enrollment_index_resp[2])
         response_str = request_for_pending_review_enrollment(row)[1]
+        result.append("5")
         result.append(response_str.status_code)
         return result, response_str
 
 
 def disable_approve_enrollment_end_to_end_flow():
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\mask_face.png"
     result = []
     row_count = getRowCount(API_Base_Utilities.test_data_excel_path,
                             Read_API_Endpoints().disable_approve_enrollment_data_sheet_name())
@@ -1274,6 +1335,7 @@ def disable_approve_enrollment_end_to_end_flow():
         start_search_resp = start_search_request_for_mask_face(new_user_login_token(username, password))
         job_id = start_search_resp[2]
         result.append(response_validation(start_search_resp[0]))
+        time.sleep(20)
         fed_search_resp = get_fed_search_status_request_a(job_id, new_user_login_token(username, password))
         image_id = fed_search_resp[1]
         result.append(response_validation(fed_search_resp[0]))
@@ -1284,7 +1346,7 @@ def disable_approve_enrollment_end_to_end_flow():
                                                                           data[4], row)
             # result.append(response_validation(create_enroll_resp[1]))
             case_id = create_enroll_resp[3]
-            add_notes_resp = add_notes_to_enrollment_request_a(case_id, create_enroll_resp[4],
+            add_notes_resp = add_notes_to_enrollment_request_a(case_id, image_path,
                                                              new_user_login_token(username, password))
             result.append(response_validation(add_notes_resp[1]))
 
@@ -1294,16 +1356,17 @@ def disable_approve_enrollment_end_to_end_flow():
 
 
 def start_search_request_for_mask_face(token):
-    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\ak_image.png"
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\mask_face.png"
     region_id = get_user_info_request()
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().start_search_endpoint()}"
     files = [
-        ('Images', ('ak_image.png', open(image_path, 'rb'), 'image/png'))
+        ('Images', ('mask_face.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": 0.25, "regionId": region_id[2]}
-    response_str = requests.post(url, headers=headers, files=files, data=request_data)
+    response_str = requests.post(url, headers=headers, files=files, data=request_data, verify=False)
     response_json = response_str.json()
+    print(response_json)
     job_id = response_json["jobId"]
     # role_id = response_json["id"]
     return response_str, response_json, job_id
@@ -1322,7 +1385,7 @@ def add_user_to_alert_group_request_disable_en(row, group_id):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"agroupID": a_group_id[4], "userId": user_info_list[3]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     result.append(response_validation(response_str))
     return request_body, response_str, response_json, result, username, password
@@ -1345,8 +1408,9 @@ def user_request_for_create_user_no_disable_en_right(row):
                  "wphone": data[16], "fphone": data[17], "aphone": data[18], "phone_type": data[19],
                  "provider": data[20], "timezone": data[21], "urole_id": user_role[4],
                  "region_id": data[23], "username": f"{data[24]}{random_number()}", "password": data[25]}
-    response_str = requests.post(url, form_data, headers=headers)
+    response_str = requests.post(url, form_data, headers=headers, verify=False)
     response_json = response_str.json()
+    print(response_json)
     user_id = response_json["userId"]
     account_id = response_json["accountId"]
     username = response_json["userName"]
@@ -1374,7 +1438,7 @@ def create_request_for_user_role_for_disable_en(row):
                                     "profile": data[24],
                                     "tag": data[25], "face": data[26]}}
     request_data = json.dumps(request_data)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     role_id = response_json["id"]
     result = response_validation(response_str)
@@ -1389,7 +1453,7 @@ def add_enrollment_to_alert_group_request_for_disable_en(row):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     request_body = {"CGroupID": enrollment_group_id[3], "AGroupID": alert_id[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json, alert_id, enrollment_group_id[3]
 
@@ -1404,7 +1468,7 @@ def create_enrollment_group_request_for_disable_en(row):
                     "eventsSuppressionInterval": data[4], "priority": data[5], "seriousOffender": data[6],
                     "alertHexColor": data[7], "activeThreat": data[8]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     data = response_json["data"]
     return request_body, response_str, response_json, data
@@ -1420,7 +1484,7 @@ def create_notification_group_for_disable_en(row):
     request_body = {"agroupID": bool(data[0]), "description": data[1], "name": username, "ownerID": user_info_list[0],
                     "set_cgroups": data[4]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     a_group_id = response_json["data"]
     result = response_validation(response_str)
@@ -1442,7 +1506,7 @@ def create_enrollment_request_for_disable_en(image_id, token, C_group_Id, row):
         ('Image', ('image.png', image.content, 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response = requests.post(url, headers=headers, data=request_body, files=files)
+    response = requests.post(url, headers=headers, data=request_body, files=files, verify=False)
     response_json = response.json()
     caseId = response_json.get("enroll", {}).get("caseId", None)
     return request_body, response, response_json, caseId, image
@@ -1457,7 +1521,7 @@ def request_for_disable_approve_enrollment(row):
                     "Ascending": data[4],
                     "IsExact": data[5], "Fields": [{"Key": data[6], "Value": data[7]}]}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     all_pending_en = response_str.json()["caseInfo"]["cases"]
     response_json = response_str.json()
     all_case_id = []
@@ -1468,7 +1532,7 @@ def request_for_disable_approve_enrollment(row):
     for x in all_case_id:
         request_body = {"CaseId": x, "Enabled": 1}
         request_data = json.dumps(request_body)
-        response_str = requests.put(url, data=request_data, headers=headers)
+        response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     print(response_json)
     print(response_str)
     return request_data, response_str, response_json
@@ -1483,7 +1547,7 @@ def start_search_request_a(token):
     ]
     headers = {"Authorization": f"Token {token}"}
     request_data = {"threshold": 0.25, "regionId": region_id[2]}
-    response_str = requests.post(url, headers=headers, files=files, data=request_data)
+    response_str = requests.post(url, headers=headers, files=files, data=request_data, verify=False)
     response_json = response_str.json()
     job_id = response_json["jobId"]
     # role_id = response_json["id"]
@@ -1494,7 +1558,7 @@ def get_fed_search_status_request_a(job_id, token):
     headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
     params = {'jobId': job_id}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().fed_search_status_endpoint(job_id)}"
-    response_str = requests.get(url, params=params, headers=headers)
+    response_str = requests.get(url, params=params, headers=headers, verify=False)
     time.sleep(5)
     response_json = response_str.json()
     image_id = []
@@ -1504,7 +1568,7 @@ def get_fed_search_status_request_a(job_id, token):
     return response_str, image_id
 
 
-def add_notes_to_enrollment_request_a(case_id, image, token):
+def add_notes_to_enrollment_request_a(case_id, image_path, token):
     # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\image.png"
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_notes_endpoint()}"
     data = create_notes_data(2)
@@ -1513,15 +1577,18 @@ def add_notes_to_enrollment_request_a(case_id, image, token):
                     "timeIncident": data[7], "reportedBy": data[8], "reportedLoss": data[9],
                     "caseEventType": data[10],
                     "activityType": data[11], "heightType": data[12], "methodOffence": data[13],
-                    "ProfileId": data[14], "CaseId": case_id, "SetCases": data[16],
+                    "ProfileId": get_profile_id(), "CaseId": case_id, "SetCases": data[16],
                     }
 
     # image = get_image_using_image_id(image_id)
+    # files = [
+    #     ('Image', ('image.jpg', image.content, 'image/jpeg'))
+    # ]
     files = [
-        ('Image', ('image.jpg', image.content, 'image/jpeg'))
+        ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, headers=headers, data=request_body, files=files)
+    response_str = requests.post(url, headers=headers, data=request_body, files=files, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -1535,7 +1602,7 @@ def identify_enrollment_index_a(token):
     files = [
         ('Images', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, data=request_body, headers=headers, files=files)
+    response_str = requests.post(url, data=request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     matches = response_json["id"]["matches"]
     index = []

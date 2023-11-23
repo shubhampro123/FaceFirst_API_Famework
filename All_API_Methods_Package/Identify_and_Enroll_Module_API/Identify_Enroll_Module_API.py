@@ -464,7 +464,7 @@ def create_enrollment_request():
     ]
     headers = {"Authorization": f"Token {token}"}
     print(request_body)
-    response_str = requests.post(url, request_body, headers=headers, files=files)
+    response_str = requests.post(url, request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     caseId = response_json["enroll"]["caseId"]
     return request_body, response_str, response_json, caseId
@@ -487,7 +487,7 @@ def create_enrollment_with_image():
         ('Image', ('img5.png', open(image_path, 'rb'), 'image/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, params=params, headers=headers, files=files)
+    response_str = requests.post(url, params=params, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     print(response_json)
     return response_str, response_json
@@ -499,7 +499,7 @@ def get_enrollment_by_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_end_point(caseId)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     return response_str
 
 
@@ -511,7 +511,7 @@ def remove_enrollment_images_request():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().remove_enrollment_by_id()}"
     request_body = {"caseId": data[1], "images": [data[0]]}
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return request_body, response_str, response_json
@@ -523,7 +523,7 @@ def get_face_id_using_case_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_data_by_id(caseId)}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     face_id = response_json["faceIds"][0]
     return face_id, caseId
@@ -546,7 +546,7 @@ def edit_enrollment_request():
                     "basis": data[24]
                     }
     request_data = json.dumps(request_body)
-    response_str = requests.put(url, data=request_data, headers=headers)
+    response_str = requests.put(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     enroll_id = response_json["data"]
     return request_body, response_str, response_json, enroll_id
@@ -559,7 +559,7 @@ def delete_enrollment_request():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
     headers = {"Authorization": f"Token {token}"}
     params = {"caseId": caseId, "deleteAlerts": False}
-    response_str = requests.delete(url, headers=headers, params=params)
+    response_str = requests.delete(url, headers=headers, params=params, verify=False)
     response_json = response_str.json()
     enroll_id = response_json["data"]
     return params, response_str, response_json, enroll_id
@@ -574,7 +574,7 @@ def clear_enrollment_info_request():
     data = clear_enrollment_data(4)
     request_body = {"fields": [data[0]], "caseId": caseId}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, data=request_data, headers=headers)
+    response_str = requests.post(url, data=request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -591,7 +591,7 @@ def search_enrollment_request():
                     "endExpirationDate": data[11], "notInCGroup": data[12], "searchInOr": data[13],
                     "cgroup_id": get_C_group_Id()}
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, request_data, headers=headers)
+    response_str = requests.post(url, request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -603,7 +603,7 @@ def query_Enrollment_FaceInfo_request():
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().query_enrollment_info_endpoint()}"
     request_body = {"caseId": caseId}
-    response_str = requests.get(url, params=request_body, headers=headers)
+    response_str = requests.get(url, params=request_body, headers=headers, verify=False)
     response_json = response_str.json()
     return request_body, response_str, response_json
 
@@ -613,7 +613,7 @@ def get_enrollment_profiles_request():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_enrollment_profiles_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -629,7 +629,7 @@ def identify_enrollment():
     files = [
         ('Image', ('image.png', open(image_path, 'rb'), 'image/png'))
     ]
-    response_str = requests.post(url, data=request_body, headers=headers, files=files)
+    response_str = requests.post(url, data=request_body, headers=headers, files=files, verify=False)
     response_json = response_str.json()
     return response_str, response_json
 
@@ -638,16 +638,16 @@ def get_profile_id():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_profile_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
-    return response_json["profiles"][0]["profileId"]
+    return response_json["profiles"][0]["profileID"]
 
 
 def select_region():
     token = login_token()
     headers = {"Authorization": f"Token {token}"}
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().get_region_endpoint()}"
-    response_str = requests.get(url, headers=headers)
+    response_str = requests.get(url, headers=headers, verify=False)
     response_json = response_str.json()
     region = response_json["zoneInfo"]["zones"][1]["regionId"]
     return region
@@ -662,7 +662,7 @@ def add_enrollment_image(case_id):
         ('Image', ('image.png', open(image_path, 'rb'), 'img2/png'))
     ]
     headers = {"Authorization": f"Token {token}"}
-    response_str = requests.post(url, params=params, headers=headers, files=files)
+    response_str = requests.post(url, params=params, headers=headers, files=files, verify=False)
 
 
 def create_enrollment_with_id_and_notification_group_request():
@@ -675,7 +675,7 @@ def create_enrollment_with_id_and_notification_group_request():
                     "enrollmentGroupIds": [get_C_group_Id()]}
     print(request_body)
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, request_data, headers=headers)
+    response_str = requests.post(url, request_data, headers=headers, verify=False)
     response_json = response_str.json()
     print(response_json)
     return request_data, response_str, response_json
@@ -689,7 +689,7 @@ def query_enrollment_info_request():
     url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().query_enrollment_info_by_id()}"
     request_body = [case_id]
     request_data = json.dumps(request_body)
-    response_str = requests.post(url, request_data, headers=headers)
+    response_str = requests.post(url, request_data, headers=headers, verify=False)
     response_json = response_str.json()
     return request_data, response_str, response_json
 
