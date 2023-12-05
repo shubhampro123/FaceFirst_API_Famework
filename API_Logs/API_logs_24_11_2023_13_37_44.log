@@ -1,0 +1,3 @@
+24/11/2023 01:37:44 PM : root         : INFO     : test_integration_Test_07  : Execution Started >>
+24/11/2023 01:38:04 PM : root         : INFO     : actual_status_code = 500, expected_status_code = 200
+24/11/2023 01:38:04 PM : root         : INFO     : actual_message = None, expected_message = None

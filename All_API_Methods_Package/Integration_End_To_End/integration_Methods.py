@@ -219,6 +219,38 @@ class Integration_API_Methods:
             time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
             return False
 
+    def verify_enrollment_disabled_end_to_end_flow(self):
+        result = []
+        try:
+            self.row = 6
+            time_entry(self.row, "start_time", self.sheet_name)
+            response_list = end_to_end_enrollment_disabled_request()
+            self.response = response_list[1]
+            print(response_list[0])
+            if False not in response_list[0]:
+                excel_result(self.row, "Test_05", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg, True, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(True)
+            else:
+                self.log.info(f"actual_status_code = {self.response.status_code}, expected_status_code = 200")
+                self.log.info(f"actual_message = {self.act_msg}, expected_message = {self.exp_msg}")
+                excel_result(self.row, "Test_05", self.r_body, self.json_response, self.response.status_code,
+                             self.act_msg,
+                             False, self.sheet_name)
+                time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+                result.append(False)
+            if False in result:
+                return False
+            else:
+                return True
+        except Exception as ex:
+            excel_result(self.row, "Test_05", self.r_body, self.json_response, self.response.status_code, self.exp_msg,
+                         False, self.sheet_name)
+            self.log.info(f"test_integration_Test_05_Exception:  {ex}")
+            time_entry(self.row, "end_time", self.sheet_name), time_entry(self.row, "total_time", self.sheet_name)
+            return False
+
 
 ####################################################################################################################
 
@@ -567,7 +599,7 @@ def integration_end_to_end_VS_with_pic_request():
     for x in range(0, len(image_id)):
         time.sleep(2)
         # create enrollment
-        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x],2)
+        create_enroll_resp = create_enrollment_request(image_id[x], c_groups_ids[x], 2)
 
         # validation for create enrollment api request
         result.append(response_validation(create_enroll_resp[1]))
@@ -1012,7 +1044,7 @@ def add_tags_to_events(event_id):
     return response_str, response_json
 
 
-def add_enrollment_image(case_id,image_path):
+def add_enrollment_image(case_id, image_path):
     token = login_token()
     # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
     headers = {"Authorization": f"Token {token}"}
@@ -1347,7 +1379,7 @@ def disable_approve_enrollment_end_to_end_flow():
             # result.append(response_validation(create_enroll_resp[1]))
             case_id = create_enroll_resp[3]
             add_notes_resp = add_notes_to_enrollment_request_a(case_id, image_path,
-                                                             new_user_login_token(username, password))
+                                                               new_user_login_token(username, password))
             result.append(response_validation(add_notes_resp[1]))
 
         response_str = request_for_disable_approve_enrollment(row)[1]
@@ -1612,3 +1644,115 @@ def identify_enrollment_index_a(token):
     if False not in index:
         index_result = True
     return response_str, response_json, index_result
+
+
+def end_to_end_enrollment_disabled_request():
+    image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img5.png"
+    result = []
+    response_str = ""
+
+    case_id_list = []
+
+    # create enrollment
+    create_enroll_resp = create_enrollment_disabled_request(image_path, 8)
+
+    # validation for create enrollment api request
+    result.append(response_validation(create_enroll_resp[1]))
+
+    response_str = create_enroll_resp[1]
+    case_id_enabled = create_enroll_resp[3]
+    case_id_disabled = create_enroll_resp[4]
+
+    # wait for the events to generate when the video stream is running
+    while not is_events_generated(case_id_enabled):
+        time.sleep(20)
+
+    # search the events generated for all the enrollments.
+    search_events_resp_event_ids = []
+
+    search_events_resp_enabled = search_events_enabled_disabled(case_id_enabled)[2]
+    search_events_resp_disabled = search_events_enabled_disabled(case_id_disabled)[2]
+
+    if search_events_resp_enabled == True and search_events_resp_disabled == False:
+        result.append(True)
+    else:
+        result.append(False)
+
+    return result, response_str
+
+
+def create_enrollment_disabled_request(image_path, test_data_row_num):
+    token = login_token()
+    # image_path = f"{Path(__file__).parent.parent.parent}\\API_Test_Data\\img2.png"
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().create_enrollment_endpoint()}"
+    data = create_disable_enroll_data(test_data_row_num)
+    c_group_id = get_c_group_Id()
+
+    request_body_enabled = {"CgroupId": c_group_id, "OptOut": data[1], "Basis": data[2], "Action": data[3],
+                            "ActivityType": data[4], "BodyMarkings": data[5], "Build": data[6],
+                            "CaseEventType": data[7], "CaseNumber": data[8], "Enabled": 1, "Gender": data[10],
+                            "HeightType": data[11], "MethodOffence": data[12], "NarrativeDesc": data[13],
+                            "ProfileId": get_profile_id(), "ReportedBy": data[15], "ReportedLoss": data[16],
+                            "StoreId": data[17], "TimeIncident": data[18], "RegionId": data[19]}
+
+    request_body = {"CgroupId": c_group_id, "OptOut": data[1], "Basis": data[2], "Action": data[3],
+                    "ActivityType": data[4], "BodyMarkings": data[5], "Build": data[6],
+                    "CaseEventType": data[7], "CaseNumber": data[8], "Enabled": data[9], "Gender": data[10],
+                    "HeightType": data[11], "MethodOffence": data[12], "NarrativeDesc": data[13],
+                    "ProfileId": get_profile_id(), "ReportedBy": data[15], "ReportedLoss": data[16],
+                    "StoreId": data[17], "TimeIncident": data[18], "RegionId": data[19]}
+
+    files = [
+        ('Image', ('image.png', open(image_path, 'rb'), 'image/png'))
+    ]
+    headers = {"Authorization": f"Token {token}"}
+    response_enabled = requests.post(url, headers=headers, data=request_body_enabled, files=files, verify=False)
+    response_json_enabled = response_enabled.json()
+    case_id_enabled = response_json_enabled.get("enroll", {}).get("caseId", None)
+
+    time.sleep(5)
+
+    files1 = [
+        ('Image', ('image.png', open(image_path, 'rb'), 'image/png'))
+    ]
+    response_disabled = requests.post(url, headers=headers, data=request_body, files=files1, verify=False)
+    response_json_disabled = response_disabled.json()
+    case_id_disabled = response_json_disabled.get("enroll", {}).get("caseId", None)
+    print(response_disabled)
+    print(response_json_disabled)
+
+    return request_body, response_disabled, response_json_disabled, case_id_enabled,case_id_disabled
+
+
+def get_c_group_Id():
+    data = create_enrollment_group_request(3)
+    return data[3]
+
+
+def create_disable_enroll_data(row_no):
+    data = []
+    for x in range(3, 23):
+        data.append(XLUtils.read_data(API_Base_Utilities.test_data_excel_path,
+                                      Read_API_Endpoints().integration_Test_VS_data_sheet_name(), row_no, x))
+    return data
+
+
+def search_events_enabled_disabled(case_id):
+    token = login_token()
+    print(token)
+    headers = {"Authorization": f"Token {token}", "Content-Type": "application/json"}
+    url = f"{API_Base_Utilities.Base_URL}{Read_API_Endpoints().events_search_endpoint()}"
+    print(url)
+    params = {"Start": "0", "Limit": "40", "SortDirection": "1"}
+    request_body = {"caseId": case_id}
+    request_data = json.dumps(request_body)
+    print(request_data)
+    response_str = requests.post(url, data=request_data, headers=headers, params=params, verify=False)
+    response_json = response_str.json()
+    print(response_json)
+    events_generated = False
+    if not response_json["data"]:
+        events_generated = True
+
+    return response_str, response_json, events_generated
+

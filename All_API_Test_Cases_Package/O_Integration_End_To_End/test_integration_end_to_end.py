@@ -50,3 +50,10 @@ class Test_integration_api(API_Base_Utilities):
         else:
             assert False
 
+    def test_integration_Test_07(self):
+        self.logger.info("test_integration_Test_07  : Execution Started >>")
+        if Integration_API_Methods(self.logger).verify_enrollment_disabled_end_to_end_flow():
+            assert True
+        else:
+            assert False
+
